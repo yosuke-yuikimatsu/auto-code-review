@@ -28,3 +28,9 @@ This project is designed for the automated analysis of code based on events occu
 
 - **Configuration Handler** — A module for reading and processing the `.codereview.yaml` configuration file.
 
+
+
+#### 4. Roles
+
+- Responsible for the whole project - Dmitry Geyvandov
+- Contact @BigTittyWomenLover if needed
