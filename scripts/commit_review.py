@@ -54,7 +54,7 @@ kwargs = {
 # Отправка запроса и получение ответа
 try:
     response = openai.ChatCompletion.create(**kwargs)
-    review_text = response.choices[0].message.content.strip() if response.choices else "No valid response from OpenAI."
+    review_text = response.choices[0].message['content'].strip() if response.choices else "No valid response from OpenAI."
 except Exception as e:
     review_text = f"OpenAI failed to generate a review: {e}"
 
