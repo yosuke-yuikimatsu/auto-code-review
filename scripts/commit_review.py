@@ -1,5 +1,5 @@
 import os
-import openai
+from openai import OpenAI
 import sys
 import argparse
 
@@ -9,16 +9,17 @@ parser.add_argument("--file", help="Name of the file being reviewed")
 args = parser.parse_args()
 
 # Проверка наличия API ключа OpenAI
-if not os.environ.get("OPENAI_API_KEY"):
+api_key = os.environ.get("OPENAI_API_KEY")
+if not api_key:
     print("No OpenAI API key found")
     sys.exit(1)
 
-# Установка API ключа
-openai.api_key = os.environ["OPENAI_API_KEY"]
+# Создание клиента OpenAI
+client = OpenAI(api_key=api_key)
 
 # Получение параметров из переменных окружения
 model_engine = os.environ["MODEL"]
-commit_message = os.environ["COMMIT_MESSAGE"]  # Используем COMMIT_MESSAGE вместо COMMIT_TITLE
+commit_message = os.environ["COMMIT_MESSAGE"]
 max_length = int(os.environ["MAX_LENGTH"])
 prompt_base = os.environ["PROMPT"]
 
@@ -40,21 +41,18 @@ if len(prompt) > max_length:
     print(f"Prompt too long for OpenAI: {len(prompt)} characters, truncating to {max_length} characters.")
     prompt = prompt[:max_length]
 
-# Параметры для OpenAI API
-kwargs = {
-    'model': model_engine,
-    'messages': [
-        {"role": "system", "content": "You are a helpful assistant and code reviewer."},
-        {"role": "user", "content": prompt},
-    ],
-    'temperature': 0.5,
-    'max_tokens': 1024
-}
-
-# Отправка запроса и получение ответа
+# Вызов ChatCompletion через нового клиента
 try:
-    response = openai.ChatCompletion.create(**kwargs)
-    review_text = response.choices[0].message['content'].strip() if response.choices else "No valid response from OpenAI."
+    chat_completion = client.chat.completions.create(
+        model=model_engine,
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant and code reviewer."},
+            {"role": "user", "content": prompt},
+        ],
+        max_tokens=1024,
+        temperature=0.5
+    )
+    review_text = chat_completion['choices'][0]['message']['content'].strip() if chat_completion['choices'] else "No valid response from OpenAI."
 except Exception as e:
     review_text = f"OpenAI failed to generate a review: {e}"
 
