@@ -18,10 +18,14 @@ openai.api_key = os.environ["OPENAI_API_KEY"]
 
 # Получение параметров из переменных окружения
 model_engine = os.environ["MODEL"]
-commit_title = os.environ["COMMIT_TITLE"]
-commit_body = os.environ["COMMIT_BODY"]
-prompt_base = os.environ["PROMPT"]
+commit_message = os.environ["COMMIT_MESSAGE"]  # Используем COMMIT_MESSAGE вместо COMMIT_TITLE
 max_length = int(os.environ["MAX_LENGTH"])
+prompt_base = os.environ["PROMPT"]
+
+# Разделение заголовка и тела коммита
+commit_lines = commit_message.split("\n", 1)
+commit_title = commit_lines[0]
+commit_body = commit_lines[1] if len(commit_lines) > 1 else ""
 
 # Чтение содержимого файла, переданного через stdin
 code = sys.stdin.read()
@@ -29,7 +33,8 @@ file_name = args.file or "Unknown file"
 header = f"Commit title: '{commit_title}'\nCommit message: '{commit_body}'\nFile: {file_name}\n"
 
 # Формирование запроса для OpenAI
-prompt = f"{prompt_base}\n\n{header}\nCode:\n```\n{code}\n"
+prompt = f"{prompt_base}\n\n{header}\nCode:\n```\n{code}\n
+"
 
 # Обрезка, если запрос превышает допустимую длину
 if len(prompt) > max_length:
