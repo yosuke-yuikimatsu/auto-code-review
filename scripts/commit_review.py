@@ -33,8 +33,7 @@ file_name = args.file or "Unknown file"
 header = f"Commit title: '{commit_title}'\nCommit message: '{commit_body}'\nFile: {file_name}\n"
 
 # Формирование запроса для OpenAI
-prompt = f"{prompt_base}\n\n{header}\nCode:\n```\n{code}\n
-"
+prompt = f"{prompt_base}\n\n{header}\nCode:\n```\n{code}\n"
 
 # Обрезка, если запрос превышает допустимую длину
 if len(prompt) > max_length:
