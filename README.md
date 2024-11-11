@@ -6,7 +6,7 @@ This project is designed for the automated analysis of code based on events occu
 
 - **Feedback:** The analysis results are provided as comments on the PR similarly to default code-reviewing process
 
-- **Customizability:** Users can configure the types of checks (such as style, potential bugs, optimization) via a configuration file named `.codereview.yaml`.
+- **Customizability:** Users can configure the types of checks (such as style, potential bugs, optimization) via a configuration file named `.config.yaml`.
 
 #### 2. User Interface Interaction Scenario
 
