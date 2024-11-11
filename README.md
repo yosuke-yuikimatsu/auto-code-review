@@ -2,19 +2,19 @@
 
 This project is designed for the automated analysis of code based on events occurring in GitHub or GitLab. Its core functionality includes:
 
-- **Code Analysis:** Upon each push or merge request (PR), the project automatically initiates a code review using the OpenAI API or a selected LLM.
+- **Code Analysis:** Upon each merge request (PR), the project automatically initiates a code review using the OpenAI API or a selected LLM.
 
-- **Feedback:** The analysis results are provided as comments on the PR
+- **Feedback:** The analysis results are provided as comments on the PR similarly to default code-reviewing process
 
 - **Customizability:** Users can configure the types of checks (such as style, potential bugs, optimization) via a configuration file named `.codereview.yaml`.
 
 #### 2. User Interface Interaction Scenario
 
-1. **Setup:** The user configures a GitHub/GitLab webhook for push or PR events and adds the OpenAI API key to the repository settings file.
+1. **Setup:** The user configures a GitHub/GitLab webhook for PR events and adds the OpenAI API key to the repository settings file.
 
-2. **Execution:** The script is automatically triggered to analyze the code after each push or PR creation.
+2. **Execution:** The script is automatically triggered to analyze the code after each PR creation.
 
-3. **Results:** Error reports or recommendations are displayed directly in the PR
+3. **Results:** Error reports or recommendations are displayed directly in the PR via comments to certain changed code lines
 
 #### 3. Project Structure
 
