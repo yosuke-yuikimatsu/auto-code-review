@@ -3,7 +3,7 @@ name: CI - Run GitHubClient Tests #Mocked test
 on:
   pull_request:
     branches:
-      - '*'
+      - 'main'
 
 jobs:
   test:

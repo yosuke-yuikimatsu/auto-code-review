@@ -3,7 +3,7 @@ name: CI - Run parse_response tests
 on:
   pull_request:
     branches:
-      - '*'
+      - 'main'
 
 jobs:
   test:
