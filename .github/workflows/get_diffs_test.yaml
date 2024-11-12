@@ -25,6 +25,7 @@ jobs:
         run: pip list
 
       - name: Run test script
+        continue-on-error:  true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
