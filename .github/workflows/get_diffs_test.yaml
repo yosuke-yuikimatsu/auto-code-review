@@ -21,6 +21,9 @@ jobs:
       - name: Install dependencies
         run: pip install requests
 
+      - name: Check installed packages
+        run: pip list
+
       - name: Run test script
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
