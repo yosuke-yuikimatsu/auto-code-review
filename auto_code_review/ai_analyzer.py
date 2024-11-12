@@ -6,12 +6,16 @@ class AIAnalyzer:
         self.client = openai.OpenAI(api_key=api_key)
         self.temperature = settings.get("temperature", 0.7)
         self.max_tokens = settings.get("max_tokens", 1000)
+        self.code_style = settings.get("code_style", "PEP-8")
         self.model = settings.get("ai_model", "gpt-4o-mini")
 
     def analyze_diff(self, diff):
         prompt = (
             "You are a code reviewer. For each code change provided below, "
             "generate a brief, one-line comment including the line number from the diff. "
+            " You do not need to explain what code does. Your main goal is to suggest some improvements"
+            f"in realization if needed or code-style changes according to {self.code_style} and highlight possible errors if they may occur."
+            "So if everything is ok with a code line there is no need to anyhow comment it"
             "Format your response as 'Line {line_number}: {comment}'. "
             "If no comment is needed, skip that line.\n\n"
             f"Code changes:\n{diff}"
@@ -20,7 +24,10 @@ class AIAnalyzer:
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=[
-                    {"role": "system", "content": "You are a helpful code reviewer whose job is to review diffs in some PR"},
+                    {"role": "system", "content": "You are a helpful code reviewer whose job is to review diffs in some PR."
+                     "Keep in mind that you must act like a real human developer."
+                      "So, you do not need to explain what function does - you must only suggest some changes in logic, highlight possible errors"
+                      "and maybe suggest some code-style improvements"},
                     {"role": "user", "content": prompt}
                 ],
                 temperature=self.temperature,
