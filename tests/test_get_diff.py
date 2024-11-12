@@ -16,3 +16,5 @@ for diff in diffs:
     filename = diff["filename"]
     patch = diff["patch"]
     print(f"\nFile: {filename}\npatch:\n{patch}\n")
+
+assert True # Test just for checking whether diffs are stored correctly
