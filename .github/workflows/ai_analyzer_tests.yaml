@@ -1,14 +1,9 @@
-name: CI - Run AI Analyzer Tests
+name: CI - Run AI Analyzer Tests #Mocked test
 
 on:
-  push:
-    branches:
-      - test
   pull_request:
     branches:
-      - test
-      - main
-      - dev
+      - '*'
 
 jobs:
   test:

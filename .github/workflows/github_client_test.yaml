@@ -1,14 +1,9 @@
-name: CI - Run GitHubClient Tests
+name: CI - Run GitHubClient Tests #Mocked test
 
 on:
-  push:
-    branches:
-      - test
   pull_request:
     branches:
-      - main
-      - dev
-      - test
+      - '*'
 
 jobs:
   test:
