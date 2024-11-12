@@ -10,7 +10,7 @@ def main():
     args = parser.parse_args()
 
     reviewer = Reviewer(config_file=args.config)
-    reviewer.review_pull_request(owner=args.owner, repo=args.repo, pr_number=args.pr)
+    reviewer.review_pull_request(owner=args.owner, repo=args.repo, pr_number=args.pr_number)
 
 if __name__ == "__main__":
     main()
