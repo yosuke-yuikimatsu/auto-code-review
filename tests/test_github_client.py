@@ -77,7 +77,7 @@ class TestGitHubClient(unittest.TestCase):
                 "Test comment"
             )
         except Exception as e:
-            self.fail(f"post_inline_comment вызвал ошибку: {e}")
+            self.fail(f"post_inline_comment triggered an error: {e}")
 
         
         mock_post.assert_called_once()

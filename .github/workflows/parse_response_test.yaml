@@ -1,6 +1,9 @@
-name: CI - Run AI Analyzer Tests #Mocked test
+name: CI - Run parse_response tests
 
 on:
+  push:
+    branches:
+      - test
   pull_request:
     branches:
       - '*'
@@ -22,5 +25,5 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Run AiAnalyzer Tests
-        run: python -m unittest tests/test_ai_analyzer.py  
+        run: python -m unittest tests/test_parse_response.py 
       
