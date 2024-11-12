@@ -1,9 +1,6 @@
 name: CI - Run parse_response tests
 
 on:
-  push:
-    branches:
-      - test
   pull_request:
     branches:
       - '*'

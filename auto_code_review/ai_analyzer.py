@@ -1,4 +1,5 @@
 import openai
+import sys
 
 class AIAnalyzer:
     def __init__(self, api_key, settings):
@@ -26,7 +27,7 @@ class AIAnalyzer:
                 max_tokens=self.max_tokens
             )
 
-            analysis = response.choices[0].message["content"].split("\n")
+            analysis = response.choices[0].message.content.split("\n")
 
             return self.parse_response(analysis)
             
@@ -40,8 +41,7 @@ class AIAnalyzer:
             print(f"Invalid request to API: {e}")
         except Exception as e:
             print(f"An unknown error occured: {e}")
-        
-        return []
+        sys.exit(1)
     
     @staticmethod
     def parse_response(analysis) :
