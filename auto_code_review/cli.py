@@ -3,7 +3,7 @@ from .core import Reviewer
 
 def main():
     parser = argparse.ArgumentParser(description="Automatic code review for GitHub PRs")
-    parser.add_argument("--config", help="Path to configuration file", default="config.yml")
+    parser.add_argument("--config", help="Path to configuration file", default="config.yaml")
     parser.add_argument("--owner", required=True, help="Repository owner")
     parser.add_argument("--repo", required=True, help="Repository name")
     parser.add_argument("--pr-number", type=int, required=True, help="Pull request number")

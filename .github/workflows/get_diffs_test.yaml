@@ -1,4 +1,4 @@
-name: PR Review Test # Real GitHub API test
+name: Run get_diff function test # Real GitHub API test
 
 on:
   pull_request:

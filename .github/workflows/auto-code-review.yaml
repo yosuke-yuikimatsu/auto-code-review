@@ -1,4 +1,4 @@
-name: PR Review
+name: Run main PR review
 
 on:
   pull_request:
@@ -24,4 +24,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: python -m auto_code_review.cli --owner ${{ github.repository_owner }} --repo ${{ github.event.repository.name }} --pr-number ${{ github.event.pull_request.number }}
+        run: python -m auto_code_review.cli --config config.yaml --owner ${{ github.repository_owner }} --repo ${{ github.event.repository.name }} --pr-number ${{ github.event.pull_request.number }}
