@@ -3,12 +3,7 @@ name: CI - Run GitHubClient Tests
 on:
   push:
     branches:
-      - test
-  pull_request:
-    branches:
       - main
-      - dev
-      - test
 
 jobs:
   test:
@@ -21,7 +16,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.12"
+          python-version: "3.10"
 
       - name: Install dependencies
         run: pip install -r requirements.txt
