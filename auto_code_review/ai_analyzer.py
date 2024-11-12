@@ -9,10 +9,7 @@ class AIAnalyzer:
 
     def analyze_diff(self, diff):
         prompt = (
-            "You are a code reviewer. For each code change provided below, "
-            "generate a brief, one-line comment including the line number from the diff. "
-            "Format your response as 'Line {line_number}: {comment}'. "
-            "If no comment is needed, skip that line.\n\n"
+            "bla-bla-bla-bla"
             f"Code changes:\n{diff}"
         )
 
