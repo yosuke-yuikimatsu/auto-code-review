@@ -4,7 +4,7 @@ from .github_client import GitHubClient
 from .ai_analyzer import AIAnalyzer
 
 class Reviewer:
-    def __init__(self, config_file="config.yml"): # First we get configuration file with settings for auto code-review
+    def __init__(self, config_file="config.yml"): #  Get configuration file with settings for auto code-review
         self.config = self.load_config(config_file)
 
         # Get tokens which are stored in secrets of repository - OpenAI API key and GitHub token
