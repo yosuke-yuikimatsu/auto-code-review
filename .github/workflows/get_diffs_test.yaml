@@ -1,9 +1,6 @@
 name: Run get_diff function test # Real GitHub API test
 
 on:
-  push:
-    branches:
-      - test
   pull_request:
     branches:
       - '*'
