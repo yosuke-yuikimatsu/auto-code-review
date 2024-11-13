@@ -3,6 +3,8 @@ name: Run main PR review
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+    branches:
+      - main
 
 jobs:
   pr_review:
