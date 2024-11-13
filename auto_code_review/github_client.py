@@ -26,7 +26,6 @@ class GitHubClient:
         for file in files:
             filename = file["filename"]
             patch = file.get("patch", "")
-            patch = self.parse_diff(patch)
             if patch:
                 diffs.append({"filename": filename, "patch": patch})
         return diffs
