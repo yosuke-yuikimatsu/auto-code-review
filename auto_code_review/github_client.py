@@ -8,13 +8,6 @@ class GitHubClient:
             "Accept": "application/vnd.github.v3+json",
         }
         
-    @staticmethod
-    def parse_patch(patch) :
-        parsed_patch = ""
-        for line in patch.splitlines(True) :
-            if not (line.startswith("-")) :
-                parsed_patch += line
-        return parsed_patch
     
     def get_pr_files_with_diffs(self, owner, repo, pr_number):
         url = f"https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}/files"
