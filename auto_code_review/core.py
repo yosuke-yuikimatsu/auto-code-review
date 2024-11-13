@@ -60,7 +60,7 @@ class Reviewer:
                     extension = ext
                     break
             else:
-                extension = None
+                continue
 
             comments = self.analyzer.analyze_diff(patch,extension) # Generate code-review for a changed file via ChatGPT prompt
             for position, comment in comments:
