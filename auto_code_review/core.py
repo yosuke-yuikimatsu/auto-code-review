@@ -64,6 +64,6 @@ class Reviewer:
 
             comments = self.analyzer.analyze_diff(patch,extension) # Generate code-review for a changed file via ChatGPT prompt
             for position, comment in comments:
-                if comment:
-                    commit_id = self.github.get_commit_id_for_file(owner, repo, pr_number,filename) # Get commit_id of a changed file to implement inline comment feature
-                    self.github.post_inline_comment(owner, repo, pr_number, commit_id, filename, position, comment)
+                print(f"{position}\n{comment}")
+                commit_id = self.github.get_commit_id_for_file(owner, repo, pr_number,filename) # Get commit_id of a changed file to implement inline comment feature
+                self.github.post_inline_comment(owner, repo, pr_number, commit_id, filename, position, comment)
