@@ -15,15 +15,17 @@ class AIAnalyzer:
     def analyze_diff(self, diff, file_extension):
         code_style = self.get_code_style(file_extension)
         prompt = (
-            "You are a code reviewer. For each code change provided below, "
-            "generate a brief, one-line comment including the line number from the diff. \n"
-            " You do not need to explain what code does. Your main goal is to suggest some improvements"
-            f"in realization if needed or code-style changes according to {code_style}(if no code style given choose the basic one for given language) and highlight possible errors if they may occur.\n"
-            "Format your response as 'Line {line_number}: {comment}'. "
-            "Review only lines that start with +"
-            "If no comment is needed, skip that line.\n\n"
-            f"Code changes:\n{diff}"
+        "You are a code reviewer. For each code change provided below, "
+        "generate a brief, one-line comment including the line number from the diff. \n"
+        "For lines that start with '+', analyze the added code and suggest improvements or highlight any potential issues, "
+        f"including code-style changes according to {code_style} (if no code style is given, use the standard style for the language).\n"
+        "For lines that start with '-', these lines have been removed from the code. Analyze the removed code and provide feedback on "
+        "whether the removal might introduce any potential problems or bugs in the program.\n"
+        "Format your response as 'Line {line_number}: {comment}'. "
+        "If no comment is needed, skip that line.\n\n"
+        f"Code changes:\n{diff}"
         )
+
         try:
             response = self.client.chat.completions.create(
                 model=self.model,
