@@ -8,6 +8,15 @@ class GitHubClient:
             "Accept": "application/vnd.github.v3+json",
         }
 
+    def parse_diff(self,patch) : #function deletes all the lines that start with - to ensure posting comments in correct postitons
+        fixed_patch = ""
+        for line in patch.splitlines(True) :
+            if not line.startswith('-') :
+                fixed_patch += line
+            else:
+                continue
+        return fixed_patch
+
     def get_pr_files_with_diffs(self, owner, repo, pr_number):
         url = f"https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}/files"
         response = requests.get(url, headers=self.headers)
@@ -17,6 +26,7 @@ class GitHubClient:
         for file in files:
             filename = file["filename"]
             patch = file.get("patch", "")
+            patch = self.parse_diff(patch)
             if patch:
                 diffs.append({"filename": filename, "patch": patch})
         return diffs
