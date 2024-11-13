@@ -2,7 +2,7 @@
 
 analysis:
   ai_model: "gpt-4o-mini"
-  file_extensions: [".py", ".cpp"]
+  file_extensions: [".py", ".cpp",".yaml"]
 
 ai_settings:
   ai_model: gpt-4o-mini
