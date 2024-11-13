@@ -21,6 +21,7 @@ class AIAnalyzer:
             f"in realization if needed or code-style changes according to {code_style}(if no code style given choose the basic one for given language) and highlight possible errors if they may occur."
             "So if everything is ok with a code line there is no need to anyhow comment it"
             "Format your response as 'Line {line_number}: {comment}'. "
+            "Do not write comments to deleted lines(lines that start with -)"
             "If no comment is needed, skip that line.\n\n"
             f"Code changes:\n{diff}"
         )
