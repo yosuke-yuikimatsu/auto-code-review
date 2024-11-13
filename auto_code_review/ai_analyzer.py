@@ -73,7 +73,8 @@ class AIAnalyzer:
                     # Extract line number and comment for it
                     line_number_str, comment = line.split(":", 1)
                     line_number = int(line_number_str.replace("Line", "").strip())
-                    comments.append((line_number, comment.strip()))
+                    if comment.strip() :
+                        comments.append((line_number, comment.strip()))
                 except ValueError:
                     # Ignore lines with wrong format
                     continue
