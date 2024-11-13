@@ -51,8 +51,8 @@ class Reviewer:
 
         files = self.github.get_pr_files_with_diffs(owner, repo, pr_number) # Get all files from PR which were changed
         for file in files:
-            filename = file["filename"]
             patch = file["patch"]
+            filename = file["filename"]
 
             # Filter changed files by extension
             for ext in extensions:
@@ -60,7 +60,7 @@ class Reviewer:
                     extension = ext
                     break
             else:
-                continue
+                extension = None
 
             comments = self.analyzer.analyze_diff(patch,extension) # Generate code-review for a changed file via ChatGPT prompt
             for position, comment in comments:
