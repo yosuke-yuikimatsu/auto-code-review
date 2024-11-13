@@ -37,8 +37,11 @@ class GitHubClient:
             "path": path,
             "position": position
         }
-        response = requests.post(url, headers=self.headers, json=data)
-        response.raise_for_status()
+        try:
+            response = requests.post(url, headers=self.headers, json=data)
+            response.raise_for_status()
+        except:
+            raise ValueError("Request failed to post comment")
     
     def get_commit_id_for_file(self, owner, repo, pr_number, filename):
         """
