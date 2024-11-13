@@ -18,8 +18,8 @@ class GitHubClient:
         for file in files:
             filename = file["filename"]
             patch = file.get("patch", "")
-            if patch:
-                diffs.append({"filename": filename, "patch": patch})
+            if patch.strip():
+                diffs.append({"filename": filename, "patch": patch.strip()})
         return diffs
 
     def post_inline_comment(self, owner, repo, pr_number, commit_id, path, position, comment):

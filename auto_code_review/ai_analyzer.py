@@ -6,14 +6,11 @@ class AIAnalyzer:
         self.client = openai.OpenAI(api_key=api_key)
         self.temperature = settings.get("temperature", 0.7)
         self.max_tokens = settings.get("max_tokens", 1000)
-        self.code_styles = settings.get("code_style", [])
+        self.code_styles = settings.get("code_style", {})
         self.model = settings.get("ai_model", "gpt-4o-mini")
 
-    def get_code_style(self,file_extension) :
-        return self.code_styles.get(file_extension, "")
-
     def analyze_diff(self, diff, file_extension):
-        code_style = self.get_code_style(file_extension)
+        code_style = self.code_styles.get(file_extension,"")
         prompt = (
             "You are a code reviewer. For each code change provided below, "
             "generate a brief, one-line comment including the line number from the diff. "
@@ -66,6 +63,7 @@ class AIAnalyzer:
 
             # Getting rid of enumeration
             if line[0].isdigit() and line[1] == ".":
+                print(line) # For testing purposes only
                 line = line.split(".", 1)[1].strip()
             
             if line.strip() and line.startswith("Line"):
@@ -74,7 +72,8 @@ class AIAnalyzer:
                     line_number_str, comment = line.split(":", 1)
                     line_number = int(line_number_str.replace("Line", "").strip())
                     comments.append((line_number, comment.strip()))
-                except ValueError:
+                except:
+                    raise ValueError("Something went wrong while parssing the response")
                     # Ignore lines with wrong format
                     continue
 
