@@ -6,15 +6,19 @@ class AIAnalyzer:
         self.client = openai.OpenAI(api_key=api_key)
         self.temperature = settings.get("temperature", 0.7)
         self.max_tokens = settings.get("max_tokens", 1000)
-        self.code_style = settings.get("code_style", "PEP-8")
+        self.code_styles = settings.get("code_style", [])
         self.model = settings.get("ai_model", "gpt-4o-mini")
 
-    def analyze_diff(self, diff):
+    def get_code_style(self,file_extension) :
+        return self.code_styles.get(file_extension, "")
+
+    def analyze_diff(self, diff, file_extension):
+        code_style = self.get_code_style(file_extension)
         prompt = (
             "You are a code reviewer. For each code change provided below, "
             "generate a brief, one-line comment including the line number from the diff. "
             " You do not need to explain what code does. Your main goal is to suggest some improvements"
-            f"in realization if needed or code-style changes according to {self.code_style} and highlight possible errors if they may occur."
+            f"in realization if needed or code-style changes according to {code_style}(if no code style given choose the basic one for given language) and highlight possible errors if they may occur."
             "So if everything is ok with a code line there is no need to anyhow comment it"
             "Format your response as 'Line {line_number}: {comment}'. "
             "If no comment is needed, skip that line.\n\n"

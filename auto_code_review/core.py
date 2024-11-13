@@ -55,10 +55,14 @@ class Reviewer:
             patch = file["patch"]
 
             # Filter changed files by extension
-            if not any(filename.endswith(ext) for ext in extensions):
+            for ext in extensions:
+                if filename.endswith(ext):
+                    extension = ext
+                    break
+            else:
                 continue
 
-            comments = self.analyzer.analyze_diff(patch) # Generate code-review for a changed file via ChatGPT prompt
+            comments = self.analyzer.analyze_diff(patch,extension) # Generate code-review for a changed file via ChatGPT prompt
             for position, comment in comments:
                 commit_id = self.github.get_commit_id_for_file(owner, repo, pr_number,filename) # Get commit_id of a changed file to implement inline comment feature
                 self.github.post_inline_comment(owner, repo, pr_number, commit_id, filename, position, comment)
