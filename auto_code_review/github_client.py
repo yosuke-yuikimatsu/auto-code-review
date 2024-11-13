@@ -39,6 +39,8 @@ class GitHubClient:
             "path": path,
             "position": position
         }
+        print(f"URL: {url}")
+        print(f"Data: {data}")
         response = requests.post(url, headers=self.headers, json=data)
         response.raise_for_status()
     
