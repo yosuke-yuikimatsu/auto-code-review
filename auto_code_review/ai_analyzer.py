@@ -21,8 +21,10 @@ class AIAnalyzer:
         f"including code-style changes according to {code_style} (if no code style is given, use the standard style for the language).\n"
         "For lines that start with '-', these lines have been removed from the code. Analyze the removed code and provide feedback on "
         "whether the removal might introduce any potential problems or bugs in the program.\n"
-        "Format your response as 'Line {line_number}: {comment}'. "
+        "Format your response as 'Line {line_number}: {comment}' where '{line_number}' is the number of the line in the given diff not in the real file"
+        "considering the line that starts with @@ to have line_number equal to zero"
         "If no comment is needed, skip that line.\n\n"
+        "Also do not apply any extra formatting to your response"
         f"Code changes:\n{diff}"
         )
 
