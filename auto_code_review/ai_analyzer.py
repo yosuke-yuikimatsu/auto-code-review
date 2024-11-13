@@ -6,7 +6,7 @@ class AIAnalyzer:
         self.client = openai.OpenAI(api_key=api_key)
         self.temperature = settings.get("temperature", 0.7)
         self.max_tokens = settings.get("max_tokens", 1000)
-        self.code_styles = settings.get("code_style", ["PEP-8"])
+        self.code_styles = settings.get("code_style", {})
         self.model = settings.get("ai_model", "gpt-4o-mini")
 
     def get_code_style(self,file_extension) :
