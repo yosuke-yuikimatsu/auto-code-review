@@ -1,6 +1,7 @@
 import openai
 import json
 import sys
+import re
 
 class AIAnalyzer:
     def __init__(self, api_key, settings):
@@ -22,8 +23,9 @@ class AIAnalyzer:
             f"including code-style changes according to {code_style} (if no code style is given, use the standard style for the language).\n"
             "For lines that start with '-', these lines have been removed from the code. Analyze the removed code and provide feedback on "
             "whether the removal might introduce any potential problems or bugs in the program.\n"
-            "Return your response in JSON format, where each key is a line from the diff, and the value is your comment for that line.\n"
-            "If no comment is needed for a line, skip it and do not include it in the JSON response.\n\n"
+            f"Return your response as a Python string in a format: SOC(line (the whole itself without any changes) <<<>>> comment)EOC where each pair is placed on its own line\n"
+            "Also do not add any extra whitespaces. There must be no whitespace between line of code and <<<>>>"
+            "If no comment is needed for a line, skip it and do not include it in the response\n\n"
             f"Code changes:\n{diff}"
         )
 
@@ -41,11 +43,11 @@ class AIAnalyzer:
                 max_tokens=self.max_tokens
             )
 
+            response = response.choices[0].message.content
             print(response)
-            json_response = response.choices[0].message.content
-            analysis = json.loads(json_response)
+            response = self.response_to_dict(response)
 
-            return self.parse_response(analysis,diff)
+            return self.parse_response(response,diff)
 
         except openai.APIError:
             print("Authentification Error: Check your API key.")
@@ -58,6 +60,20 @@ class AIAnalyzer:
         except Exception as e:
             print(f"An unknown error occured: {e}")
         sys.exit(1)
+    
+    @staticmethod
+    def response_to_dict(response) :
+        matches = re.findall(r"SOC(.*?)EOC", response, re.DOTALL)
+        dict = {}
+
+        for match in matches:
+            line, comment = match.split("<<<>>>")
+            if line.startswith('(') :
+                line = line[1:]
+            if comment.endswith(')') :
+                comment = comment[:-1]
+            dict[line] = comment
+
     
     @staticmethod
     def parse_response(analysis,diff) :
