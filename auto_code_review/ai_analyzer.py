@@ -20,8 +20,8 @@ class AIAnalyzer:
             f"including code-style changes according to {code_style} (if no code style is given, use the standard style for the language).\n"
             "For lines that start with '-', these lines have been removed from the code. Analyze the removed code and provide feedback on "
             "whether the removal might introduce any potential problems or bugs in the program.\n"
-            f"Return your response as a Python string in a format: SOC(line (the whole itself without any changes) <<<>>> comment)EOC where each pair is placed on its own line\n"
-            "Also do not add any extra whitespaces. There must be no whitespace between line of code and <<<>>>"
+            f"Return your response as a Python string in a format - {"SOC(line (the whole itself without any changes) <<<>>> comment )FOC"} - where each pair is placed on its own line\n"
+            "There must be no whitespace between line of code and <<<>>>"
             "If no comment is needed for a line, skip it and do not include it in the response\n\n"
             f"Code changes:\n{diff}"
         )
@@ -60,7 +60,7 @@ class AIAnalyzer:
     
     @staticmethod
     def response_to_dict(response) :
-        matches = re.findall(r"SOC(.*?)EOC", response, re.DOTALL)
+        matches = re.findall(r"SOC(.*?)FOC", response, re.DOTALL)
         dict = {}
 
         for match in matches:
@@ -70,6 +70,7 @@ class AIAnalyzer:
             if comment.endswith(')') :
                 comment = comment[:-1]
             dict[line] = comment
+        return dict
 
     
     @staticmethod
@@ -103,7 +104,7 @@ class AIAnalyzer:
                     })
                 old_file_line_counter += 1
                 new_file_line_counter += 1
-
+        print(comments)
         return comments
 
 
