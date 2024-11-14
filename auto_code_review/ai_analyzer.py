@@ -9,12 +9,12 @@ class AIAnalyzer:
         self.code_styles = settings.get("code_style", {})
         self.model = settings.get("ai_model", "gpt-4o-mini")
 
-    def analyze_diff(self, diff, code):
-        prompt = (
-            """
-            Could you describe briefly {problems} for the next code with given git diffs? 
+    @staticmethod
+    def make_prompt(diff,code) :
+        prompt = f"""
+            Could you describe briefly {{problems}} for the next code with given git diffs? 
             Please, also, do not add intro words, just print errors in the format: "line_number : cause effect"
-            If there are no {problems} just say "{no_response}".
+            If there are no {{problems}} just say "{{no_response}}".
 
             DIFFS:
 
@@ -24,27 +24,28 @@ class AIAnalyzer:
             
             {code}
             """
-        )
+        
+        return prompt
 
+    def analyze_diff(self, diff, code):
         try:
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=[
                     {
                         "role": "system",
-                        "content": "You are a helpful code reviewer whose job is to review code diffs and provide feedback."
+                        "content": self.make_prompt(diff,code)
                     },
-                    {"role": "user", "content": prompt}
                 ],
                 temperature=self.temperature,
-                max_tokens=self.max_tokens
+                max_tokens=self.max_tokens,
+                stream=True
             )
             content = []
             for chunk in response:
                 if chunk.choices[0].delta.content:
                     content.append(chunk.choices[0].delta.content)
-            content = " ".join(content)
-            return self.parse_response(content)
+            return " ".join(content)
 
         except openai.APIError:
             print("Authentification Error: Check your API key.")
