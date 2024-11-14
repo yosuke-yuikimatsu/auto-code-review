@@ -1,7 +1,5 @@
 import openai
-import json
 import sys
-import re
 
 class AIAnalyzer:
     def __init__(self, api_key, settings):
@@ -11,22 +9,21 @@ class AIAnalyzer:
         self.code_styles = settings.get("code_style", {})
         self.model = settings.get("ai_model", "gpt-4o-mini")
 
-    def get_code_style(self,file_extension) :
-        return self.code_styles.get(file_extension, "")
-
-    def analyze_diff(self, diff, file_extension):
-        code_style = self.get_code_style(file_extension)
+    def analyze_diff(self, diff, code):
         prompt = (
-            "You are a code reviewer. For each code change provided below, "
-            "generate a brief comment for each line in the diff. \n"
-            "For lines that start with '+', analyze the added code and suggest improvements or highlight any potential issues, "
-            f"including code-style changes according to {code_style} (if no code style is given, use the standard style for the language).\n"
-            "For lines that start with '-', these lines have been removed from the code. Analyze the removed code and provide feedback on "
-            "whether the removal might introduce any potential problems or bugs in the program.\n"
-            f"Return your response as a Python string in a format - {"SOC(line (the whole itself without any changes) <<<>>> comment )FOC"} - where each pair is placed on its own line\n"
-            "There must be no whitespace between line of code and <<<>>>"
-            "If no comment is needed for a line, skip it and do not include it in the response\n\n"
-            f"Code changes:\n{diff}"
+            """
+            Could you describe briefly {problems} for the next code with given git diffs? 
+            Please, also, do not add intro words, just print errors in the format: "line_number : cause effect"
+            If there are no {problems} just say "{no_response}".
+
+            DIFFS:
+
+            {diff}
+            
+            Full code from the file:
+            
+            {code}
+            """
         )
 
         try:
@@ -42,12 +39,12 @@ class AIAnalyzer:
                 temperature=self.temperature,
                 max_tokens=self.max_tokens
             )
-
-            response = response.choices[0].message.content
-            print(response)
-            response = self.response_to_dict(response)
-
-            return self.parse_response(response,diff)
+            content = []
+            for chunk in response:
+                if chunk.choices[0].delta.content:
+                    content.append(chunk.choices[0].delta.content)
+            content = " ".join(content)
+            return self.parse_response(content)
 
         except openai.APIError:
             print("Authentification Error: Check your API key.")
@@ -61,53 +58,35 @@ class AIAnalyzer:
             print(f"An unknown error occured: {e}")
         sys.exit(1)
     
+
     @staticmethod
-    def response_to_dict(response) :
-        matches = re.findall(r"SOC(.*?)FOC", response, re.DOTALL)
-        dict = {}
+    def parse_response(input) :
+        if input is None or not input:
+            return []
+        
+        lines = input.strip().split("\n")
+        models = []
 
-        for match in matches:
-            line, comment = match.split("<<<>>>")
-            if line.startswith('(') :
-                line = line[1:]
-            if comment.endswith(')') :
-                comment = comment[:-1]
-            dict[line] = comment
-        return dict
+        for full_text in lines:
+            number_str = ''
+            number = 0
+            full_text = full_text.strip()
+            if len( full_text ) == 0:
+                continue
 
+            reading_number = True
+            for char in full_text.strip():
+                if reading_number:
+                    if char.isdigit():
+                        number_str += char
+                    else:
+                        break
+
+            if number_str:
+                number = int(number_str)
+
+            models.append({"line" : number, "comment" : full_text})
+        return models
     
-    @staticmethod
-    def parse_response(analysis,diff) :
-        comments = []
-        old_file_line_counter = 0
-        new_file_line_counter = 0
-        for line in diff.splitlines() :
-            if line.startswith('-') :
-                if line in analysis:
-                    comments.append({
-                        "deleted" : True,
-                        "line_number" : old_file_line_counter,
-                        "comment" : analysis[line]
-                    })
-                old_file_line_counter += 1
-            elif line.startswith('+') :
-                if line in analysis:
-                    comments.append({
-                        "deleted": False,
-                        "line_number": new_file_line_counter,
-                        "comment": analysis[line]
-                    })
-                new_file_line_counter += 1
-            else:
-                if line in analysis:
-                    comments.append({
-                        "deleted" : False,
-                        "line_number": new_file_line_counter,
-                        "comment" : analysis[line]
-                    })
-                old_file_line_counter += 1
-                new_file_line_counter += 1
-        print(comments)
-        return comments
 
 
