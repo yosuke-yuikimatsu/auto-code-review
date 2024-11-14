@@ -63,7 +63,7 @@ class Reviewer:
             else:
                 continue
 
-            comments = self.analyzer.analyze_diff(patch,extension,code) # Generate code-review as a list of dicts for a changed file via ChatGPT prompt
+            comments = self.analyzer.analyze_diff(patch,code) # Generate code-review as a list of dicts for a changed file via ChatGPT prompt
             commit_id = self.github.get_commit_id_for_file(owner,repo,pr_number,filename)
             for comment in comments:
                 body = comment.get("comment","")
