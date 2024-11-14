@@ -53,6 +53,7 @@ class Reviewer:
         for file in files:
             filename = file["filename"]
             patch = file["patch"]
+            code = file["content"]
 
             # Filter changed files by extension
             for ext in extensions:
@@ -62,12 +63,11 @@ class Reviewer:
             else:
                 continue
 
-            comments = self.analyzer.analyze_diff(patch,extension) # Generate code-review as a list of dicts for a changed file via ChatGPT prompt
+            comments = self.analyzer.analyze_diff(patch,extension,code) # Generate code-review as a list of dicts for a changed file via ChatGPT prompt
             commit_id = self.github.get_commit_id_for_file(owner,repo,pr_number,filename)
             for comment in comments:
                 body = comment.get("comment","")
-                line = comment.get("line_number",-1)
-                deleted = comment.get("deleted",None)
-                if (not body) or (line == -1) or (deleted is None) :
-                    raise ValueError(f"Comments to patch: {patch} are incorrectly formated\n.body: {body}\nline: {line}\ndeleted: {deleted}\n")
-                self.github.post_inline_comment(owner,repo,pr_number,commit_id,filename,line,body,deleted)
+                line = comment.get("line",-1)
+                if (not body) or (line == -1) :
+                    raise ValueError(f"Comments to patch: {patch} are incorrectly formated\n.body: {body}\nline: {line}\n")
+                self.github.post_inline_comment(owner,repo,pr_number,commit_id,filename,line,body)
