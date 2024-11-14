@@ -107,6 +107,7 @@ class AIAnalyzer:
                     })
                 old_file_line_counter += 1
                 new_file_line_counter += 1
+        print(comments)
         return comments
 
 
