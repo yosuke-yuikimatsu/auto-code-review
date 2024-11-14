@@ -1,79 +1,70 @@
 import requests
-import base64
+import subprocess
 
 class GitHubClient:
-    def __init__(self, token):
+    def __init__(self, token,repo,owner,pr_number,base_ref,head_ref):
         self.token = token # Intialize GitHub API
         self.headers = {
             "Authorization": f"token {self.token}",
             "Accept": "application/vnd.github.v3+json",
         }
-
-    def get_pr_files_with_diffs(self, owner, repo, pr_number):
-        url = f"https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}/files"
-        response = requests.get(url, headers=self.headers)
-        response.raise_for_status()
-        files = response.json()
-        diffs = []
-
-        for file in files:
-            filename = file["filename"]
-            patch = file.get("patch", "").strip()
-
-            # Get the whole file
-            file_url = f"https://api.github.com/repos/{owner}/{repo}/contents/{filename}"
-            file_response = requests.get(file_url, headers=self.headers)
-            file_response.raise_for_status()
-            file_content = file_response.json().get("content", "")
-            
-            decoded_content = base64.b64decode(file_content).decode("utf-8")
-
-            diffs.append({
-                "filename": filename,
-                "patch": patch,
-                "content": decoded_content
-            })
-
-        return diffs
-
-
-    def post_inline_comment(self, owner, repo, pr_number, commit_id, path, position, comment):
-        url = f"https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}/comments"
-        data = {
-            "path" : path,
-            "commit_id" : commit_id,
-            "body" : comment,
-            "position" : position
-        }
-        try:
-            response = requests.post(url, headers=self.headers, json=data)
-            response.raise_for_status()
-        except:
-            print(f"{url}\n")
-            print(f"{data}")
-            raise ValueError("Request failed to post comment")
+        self.repo = repo
+        self.owner = owner
+        self.pr_number = pr_number
+        self.base_ref = base_ref
+        self.head_ref = head_ref
+        self.__url_add_comment = f"https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}/comments"
+        self.__url_add_issue = f"https://api.github.com/repos/{owner}/{repo}/issues/{pr_number}/comments"
     
-    def get_commit_id_for_file(self, owner, repo, pr_number, filename):
-        """
-        Find SHA of a commit in which the given file was changed from PR 
-        """
-        # Get all commits from PR
-        commits_url = f"https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}/commits"
-        commits_response = requests.get(commits_url, headers=self.headers)
-        commits_response.raise_for_status()
-        commits = commits_response.json()
+    @staticmethod
+    def __run_subprocess(options):
+        result = subprocess.run(options, stdout=subprocess.PIPE, text=True)
+        if result.returncode == 0:
+            return result.stdout
+        else:
+            raise Exception(f"Error running {options}: {result.stderr}")
+    
+    def get_remote_name(self) :
+        command = ["git", "remote", "-v"]
+        result = self.__run_subprocess(command)
+        lines = result.strip().splitlines()
+        return lines[0].split()[0]
+    
+    def get_last_commit_sha(self,file) -> str:
+        command = ["git", "log", "-1", "--format=\"%H\"", "--", file]
+        result = self.__run_subprocess(command)
+        lines = result.strip().splitlines()
+        return lines[0].split()[0].replace('"', "")
+    
+    def get_diff_files(self,remote_name) :
+        command = ["git", "diff", "--name-only", f"{remote_name}/{self.base_ref}", f"{remote_name}/{self.head_ref}"]
+        result = self.__run_subprocess(command)
+        return result.strip().splitlines()
+    
+    def get_diff_in_file(self,remote_name,file_path) -> str:
+        command = ["git", "diff", f"{remote_name}/{self.base_ref}", f"{remote_name}/{self.head_ref}", "--", file_path]
+        return self.__run_subprocess(command)
+    
+    def post_comment_to_line(self, text, commit_id, file_path, line):
+        body = {
+            "body": text,
+            "commit_id": commit_id,
+            "path" : file_path,
+            "position" : line
+        }
+        response = requests.post(self.__url_add_comment, json = body, headers = self.headers)
+        response.raise_for_status()
 
-        # Iterate over all PR's commits to find the one in which the given file was changed most recently
-        for commit in reversed(commits):
-            commit_sha = commit["sha"]
+    def post_comment_general(self, text):
+        body = {
+            "body": text
+        }
+        response = requests.post(self.__url_add_issue, json = body, headers = self.headers)
+        response.raise_for_status()
+    
 
-            commit_details_url = f"https://api.github.com/repos/{owner}/{repo}/commits/{commit_sha}"
-            details_response = requests.get(commit_details_url, headers=self.headers)
-            details_response.raise_for_status()
-            commit_files = details_response.json().get("files", [])
 
-            for file in commit_files:
-                if file["filename"] == filename:
-                    return commit_sha
 
-        raise ValueError(f"Commit for file {filename} was not found in PR #{pr_number}.")
+
+
+    

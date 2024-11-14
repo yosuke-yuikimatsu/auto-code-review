@@ -11,14 +11,35 @@ class Reviewer:
         github_token = os.getenv("GITHUB_TOKEN")
         openai_api_key = os.getenv("OPENAI_API_KEY")
 
+        # Get head_ref and body_ref for getting diffs
+        head_ref = os.getenv("GITHUB_HEAD_REF")
+        base_ref = os.getenv("GITHUB_BASE_REF")
+
+        owner = os.getenv("REPO_OWNER")
+        repo = os.getenv("REPO_NAME")
+        pr_number = os.getenv("PULL_NUMBER")
+
+
         if not github_token:
             raise ValueError("GITHUB_TOKEN is not found. Make sure to write it in your workflow file and access it via GitHub secrets")
         if not openai_api_key:
             raise ValueError("OPENAI_API_KEY is not found. Make sure to write it in your worflow file and access it via GitHub secrets")
+        if not head_ref:
+            raise ValueError("GITHUB_HEAD_REF is not found. Make sure to write it in your workflow file via github.")
+        if not base_ref:
+            raise ValueError("GITHUB_BASE_REF is not found. Make sure to write it in you workflow file via github.")
+        if not owner:
+            raise ValueError("REPO_OWNER is not found. Make sure to define it in your workflow file.")
+        if not repo:
+            raise ValueError("REPO_NAME is not found. Make sure to define it in your workflow file.")
+        if not pr_number:
+            raise ValueError("PULL_NUMBER is not found. Make sure to define it in your workflow file.")
+
 
         # Initialzie instances of GitHub interactor and OpenAI analyzer
-        self.github = GitHubClient(github_token)
+        self.github = GitHubClient(github_token,repo,owner,pr_number,base_ref,head_ref)
         self.analyzer = AIAnalyzer(openai_api_key, self.config.get("ai_settings"))
+
 
     def load_config(self, config_file):
     # Check whether configuration file exists
@@ -39,36 +60,53 @@ class Reviewer:
         except Exception as e:
             raise RuntimeError(f"Failed to download configuration file '{config_file}': {e}")  
 
-    def review_pull_request(self, owner, repo, pr_number):
-        extensions = self.config.get("analysis", {}).get("file_extensions")  # Files which must be reviewed
+    def review_pull_request(self) :
+        remote_name = self.github.get_remote_name()
 
+        changed_files = self.github.get_diff_files(remote_name)
+
+        extensions = self.config.get("analysis",{}).get("file_extensions",[])
+        
         if not extensions:
-            raise KeyError(
-                "'file_extensions' key in 'analysis' section of the configuration file is absent.\n"
-                "It must be added to the configuration file in the following format: [\".ext\", \".ext\",...]"
-                )
+            raise ValueError("No file_extensions found.File_extensions must be written in config.yaml file")
 
+        for file in changed_files:
 
-        files = self.github.get_pr_files_with_diffs(owner, repo, pr_number) # Get all files from PR which were changed
-        for file in files:
-            filename = file["filename"]
-            patch = file["patch"]
-            code = file["content"]
+            _, file_extension = os.path.splitext(file)
 
-            # Filter changed files by extension
-            for ext in extensions:
-                if filename.endswith(ext):
-                    extension = ext
-                    break
-            else:
+            if file_extension not in extensions:
+                print("Unsupported extensions")
+                continue
+            
+            try:
+                with open(file, 'r') as file_opened:
+                    file_content = file_opened.read()
+            except FileNotFoundError:
+                print(f"{file} was removed")
                 continue
 
+            if len(file_content) == 0:
+                print(f"{file} is empty")
+                continue
 
-            comments = self.analyzer.analyze_diff(patch,code) # Generate code-review as a list of dicts for a changed file via ChatGPT prompt
-            commit_id = self.github.get_commit_id_for_file(owner,repo,pr_number,filename)
-            for comment in comments:
-                body = comment.get("comment","")
-                line = comment.get("line",-1)
-                if (not body) or (line == -1) :
-                    raise ValueError(f"Comments to patch: {patch} are incorrectly formated\n.body: {body}\nline: {line}\n")
-                self.github.post_inline_comment(owner,repo,pr_number,commit_id,filename,line,body)
+            file_diffs = self.github.get_diff_in_file(remote_name,file)
+
+            if len(file_diffs) == 0:
+                print(f"{file} diffs are empty")
+
+            responses = self.analyzer.analyze_diff(file_diffs,file_content)
+
+            for response in responses:
+                line = response.get("line")
+                comment = response.get("comment")
+                if not comment:
+                    print("No comments were given")
+                    continue
+                if line is None:
+                    self.github.post_comment_general(comment)
+                else:
+                    self.github.post_comment_to_line(comment,self.github.get_last_commit_sha(file),file,line)
+
+                
+
+
