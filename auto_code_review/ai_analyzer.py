@@ -38,6 +38,7 @@ class AIAnalyzer:
                 max_tokens=self.max_tokens
             )
 
+            print(response)
             json_response = response.choices[0].message.content
             analysis = json.loads(json_response)
 
