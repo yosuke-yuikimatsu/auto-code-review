@@ -2,7 +2,7 @@ name: Run main PR review
 
 on:
   pull_request:
-    types: [opened]
+    types:  [opened, synchronize, reopened]
     branches:
       - test
 
@@ -15,7 +15,9 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -29,4 +31,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: python -m auto_code_review.cli --config config.yaml --owner ${{ github.repository_owner }} --repo ${{ github.event.repository.name }} --pr-number ${{ github.event.pull_request.number }}
+          GITHUB_HEAD_REF: ${{ github.head_ref }}
+          GITHUB_BASE_REF: ${{ github.base_ref }}
+          REPO_OWNER: ${{ github.repository_owner }}
+          REPO_NAME: ${{ github.event.repository.name }}
+          PULL_NUMBER: ${{ github.event.number }}
+        run: python -m auto_code_review.cli --config config.yaml
