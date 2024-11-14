@@ -1,5 +1,6 @@
 import os
 from auto_code_review.github_client import GitHubClient
+import sys
 
 
 token = os.getenv("GITHUB_TOKEN")
@@ -15,6 +16,7 @@ print("Changed files and their patches:")
 for diff in diffs:
     filename = diff["filename"]
     patch = diff["patch"]
-    print(f"\nFile: {filename}\npatch:\n{patch}\n")
+    code = diff["content"]
+    print(f"\nFile: {filename}\npatch:\n{patch}\ncode:\n{code}")
 
-assert True # Test just for checking whether diffs are stored correctly
+sys.exit(0)
