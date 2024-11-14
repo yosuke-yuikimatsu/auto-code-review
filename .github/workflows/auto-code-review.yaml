@@ -2,7 +2,9 @@ name: Run main PR review
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened]
+    branches:
+      - test
 
 jobs:
   pr_review:

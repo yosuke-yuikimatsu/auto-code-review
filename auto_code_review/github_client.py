@@ -7,8 +7,7 @@ class GitHubClient:
             "Authorization": f"token {self.token}",
             "Accept": "application/vnd.github.v3+json",
         }
-        
-    
+
     def get_pr_files_with_diffs(self, owner, repo, pr_number):
         url = f"https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}/files"
         response = requests.get(url, headers=self.headers)
@@ -22,16 +21,23 @@ class GitHubClient:
                 diffs.append({"filename": filename, "patch": patch.strip()})
         return diffs
 
-    def post_inline_comment(self, owner, repo, pr_number, commit_id, path, position, comment):
+    def post_inline_comment(self, owner, repo, pr_number, commit_id, path, line, comment,deleted):
         url = f"https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}/comments"
+        side = "LEFT" if deleted else "RIGHT"
         data = {
-            "body": comment,
-            "commit_id": commit_id,
-            "path": path,
-            "position": position
+            "path" : path,
+            "commit_id" : commit_id,
+            "line" : line,
+            "body" : comment,
+            "side" : side
         }
-        response = requests.post(url, headers=self.headers, json=data)
-        response.raise_for_status()
+        try:
+            response = requests.post(url, headers=self.headers, json=data)
+            response.raise_for_status()
+        except:
+            print(f"{url}\n")
+            print(f"{data}")
+            raise ValueError("Request failed to post comment")
     
     def get_commit_id_for_file(self, owner, repo, pr_number, filename):
         """
