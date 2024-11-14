@@ -12,19 +12,19 @@ class AIAnalyzer:
     @staticmethod
     def make_prompt(diff,code) :
         prompt = f"""
-            Could you describe briefly {{problems}} for the next code with given git diffs? 
-            Please, also, do not add intro words, just print errors in the format: "line_number : cause effect"
-            If there are no {{problems}} just say "{{no_response}}".
+            Could you describe briefly {{problems}} for the next code with given git diffs or make suggestions to realization and code-style?
+            Please, also, do not add intro words, just print errors in the format: "line_number : cause effect".
+            If there are no {{problems}}, just say "{{no_response}}".
 
             DIFFS:
 
             {diff}
-            
+
             Full code from the file:
-            
+
             {code}
-            """
-        
+            """.strip()
+
         return prompt
 
     def analyze_diff(self, diff, code):
