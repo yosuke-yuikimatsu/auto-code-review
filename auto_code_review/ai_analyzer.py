@@ -46,6 +46,7 @@ class AIAnalyzer:
                 if chunk.choices[0].delta.content:
                     content.append(chunk.choices[0].delta.content)
             content = " ".join(content)
+            
             return self.parse_response(content)
 
         except openai.APIError:
