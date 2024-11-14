@@ -1,4 +1,5 @@
 import requests
+import base64
 
 class GitHubClient:
     def __init__(self, token):
@@ -14,22 +15,35 @@ class GitHubClient:
         response.raise_for_status()
         files = response.json()
         diffs = []
+
         for file in files:
             filename = file["filename"]
-            patch = file.get("patch", "")
-            if patch.strip():
-                diffs.append({"filename": filename, "patch": patch.strip()})
+            patch = file.get("patch", "").strip()
+
+            # Get the whole file
+            file_url = f"https://api.github.com/repos/{owner}/{repo}/contents/{filename}"
+            file_response = requests.get(file_url, headers=self.headers)
+            file_response.raise_for_status()
+            file_content = file_response.json().get("content", "")
+            
+            decoded_content = base64.b64decode(file_content).decode("utf-8")
+
+            diffs.append({
+                "filename": filename,
+                "patch": patch,
+                "content": decoded_content
+            })
+
         return diffs
 
-    def post_inline_comment(self, owner, repo, pr_number, commit_id, path, line, comment,deleted):
+
+    def post_inline_comment(self, owner, repo, pr_number, commit_id, path, position, comment):
         url = f"https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}/comments"
-        side = "LEFT" if deleted else "RIGHT"
         data = {
             "path" : path,
             "commit_id" : commit_id,
-            "line" : line,
             "body" : comment,
-            "side" : side
+            "position" : position
         }
         try:
             response = requests.post(url, headers=self.headers, json=data)

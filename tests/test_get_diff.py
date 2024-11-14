@@ -16,6 +16,7 @@ print("Changed files and their patches:")
 for diff in diffs:
     filename = diff["filename"]
     patch = diff["patch"]
-    print(f"\nFile: {filename}\npatch:\n{patch}\n")
+    code = diff["content"]
+    print(f"\nFile: {filename}\npatch:\n{patch}\ncode:\n{code}")
 
 sys.exit(0)
