@@ -7,14 +7,6 @@ class GitHubClient:
             "Authorization": f"token {self.token}",
             "Accept": "application/vnd.github.v3+json",
         }
-        
-    @staticmethod
-    def parse_patch(patch) :
-        parsed_patch = ""
-        for line in patch.splitlines(True) :
-            if not (line.startswith("-")) :
-                parsed_patch += line
-        return parsed_patch
     
     def get_pr_files_with_diffs(self, owner, repo, pr_number):
         url = f"https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}/files"
@@ -29,13 +21,15 @@ class GitHubClient:
                 diffs.append({"filename": filename, "patch": patch})
         return diffs
 
-    def post_inline_comment(self, owner, repo, pr_number, commit_id, path, position, comment):
+    def post_inline_comment(self, owner, repo, pr_number, commit_id, path, line, comment,deleted):
         url = f"https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}/comments"
+        side = "LEFT" if deleted else "RIGHT"
         data = {
-            "body": comment,
-            "commit_id": commit_id,
-            "path": path,
-            "position": position
+            "path" : path,
+            "commit_id" : commit_id,
+            "line" : line,
+            "body" : comment,
+            "side" : side
         }
         try:
             response = requests.post(url, headers=self.headers, json=data)

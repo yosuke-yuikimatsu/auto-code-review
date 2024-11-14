@@ -18,7 +18,7 @@ class Reviewer:
 
         # Initialzie instances of GitHub interactor and OpenAI analyzer
         self.github = GitHubClient(github_token)
-        self.analyzer = AIAnalyzer(openai_api_key, self.config["ai_settings"])
+        self.analyzer = AIAnalyzer(openai_api_key, self.config.get("ai_settings"))
 
     def load_config(self, config_file):
     # Check whether configuration file exists
@@ -62,8 +62,12 @@ class Reviewer:
             else:
                 continue
 
-            comments = self.analyzer.analyze_diff(patch,extension) # Generate code-review for a changed file via ChatGPT prompt
-            for position, comment in comments:
-                print(f"{position}\n{comment}")
-                commit_id = self.github.get_commit_id_for_file(owner, repo, pr_number,filename) # Get commit_id of a changed file to implement inline comment feature
-                self.github.post_inline_comment(owner, repo, pr_number, commit_id, filename, position, comment)
+            comments = self.analyzer.analyze_diff(patch,extension) # Generate code-review as a list of dicts for a changed file via ChatGPT prompt
+            commit_id = self.github.get_commit_id_for_file(owner,repo,pr_number,filename)
+            for comment in comments:
+                body = comment.get("comment","")
+                line = comment.get("line_number",-1)
+                deleted = comment.get("deleted",None)
+                if (not body) or (line == -1) or (deleted is None) :
+                    raise ValueError(f"Comments to patch: {patch} are incorrectly formated\n.body: {body}\nline: {line}\ndeleted: {deleted}\n")
+                self.github.post_inline_comment(owner,repo,pr_number,commit_id,filename,line,body,deleted)

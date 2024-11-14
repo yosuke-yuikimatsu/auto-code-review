@@ -1,4 +1,5 @@
 import openai
+import json
 import sys
 
 class AIAnalyzer:
@@ -15,37 +16,36 @@ class AIAnalyzer:
     def analyze_diff(self, diff, file_extension):
         code_style = self.get_code_style(file_extension)
         prompt = (
-        "You are a code reviewer. For each code change provided below, "
-        "generate a brief, one-line comment including the line number from the diff. \n"
-        "For lines that start with '+', analyze the added code and suggest improvements or highlight any potential issues, "
-        f"including code-style changes according to {code_style} (if no code style is given, use the standard style for the language).\n"
-        "For lines that start with '-', these lines have been removed from the code. Analyze the removed code and provide feedback on "
-        "whether the removal might introduce any potential problems or bugs in the program.\n"
-        "Format your response as 'Line {line_number}: {comment}' where '{line_number}' is the number of the line in the given diff not in the real file"
-        "considering the line that starts with @@ to have line_number equal to zero"
-        "If no comment is needed, skip that line.\n\n"
-        "Also do not apply any extra formatting to your response"
-        f"Code changes:\n{diff}"
+            "You are a code reviewer. For each code change provided below, "
+            "generate a brief comment for each line in the diff. \n"
+            "For lines that start with '+', analyze the added code and suggest improvements or highlight any potential issues, "
+            f"including code-style changes according to {code_style} (if no code style is given, use the standard style for the language).\n"
+            "For lines that start with '-', these lines have been removed from the code. Analyze the removed code and provide feedback on "
+            "whether the removal might introduce any potential problems or bugs in the program.\n"
+            "Return your response in JSON format, where each key is a line from the diff, and the value is your comment for that line.\n"
+            "If no comment is needed for a line, skip it and do not include it in the JSON response.\n\n"
+            f"Code changes:\n{diff}"
         )
 
         try:
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=[
-                    {"role": "system", "content": "You are a helpful code reviewer whose job is to review diffs in some PR."
-                     "Keep in mind that you must act like a real human developer."
-                      "So, you do not need to explain what function does - you must only suggest some changes in logic, highlight possible errors"
-                      "and maybe suggest some code-style improvements"},
+                    {
+                        "role": "system",
+                        "content": "You are a helpful code reviewer whose job is to review code diffs and provide feedback."
+                    },
                     {"role": "user", "content": prompt}
                 ],
                 temperature=self.temperature,
                 max_tokens=self.max_tokens
             )
 
-            analysis = response.choices[0].message.content.split("\n")
+            json_response = response.choices[0].message.content
+            analysis = json.loads(json_response)
 
-            return self.parse_response(analysis)
-            
+            return self.parse_response(analysis,diff)
+
         except openai.APIError:
             print("Authentification Error: Check your API key.")
         except openai.RateLimitError:
@@ -59,26 +59,36 @@ class AIAnalyzer:
         sys.exit(1)
     
     @staticmethod
-    def parse_response(analysis) :
+    def parse_response(analysis,diff) :
         comments = []
-
-        # Parse response and then store it as tuple (line_number, comment)
-        for line in analysis:
-            if not line:
-                continue
-
-            # Getting rid of enumeration
-            if line[0].isdigit() and line[1] == ".":
-                line = line.split(".", 1)[1].strip()
-            
-            if line.strip() and line.startswith("Line"):
-                try:
-                    # Extract line number and comment for it
-                    line_number_str, comment = line.split(":", 1)
-                    line_number = int(line_number_str.replace("Line", "").strip())
-                    comments.append((line_number, comment.strip()))
-                except ValueError:
-                    # Ignore lines with wrong format
-                    continue
-
+        old_file_line_counter = 0
+        new_file_line_counter = 0
+        for line in diff.splitlines() :
+            if line.startswith('-') :
+                if line in analysis:
+                    comments.append({
+                        "deleted" : True,
+                        "line_number" : old_file_line_counter,
+                        "comment" : analysis[line]
+                    })
+                old_file_line_counter += 1
+            elif line.startswith('+') :
+                if line in analysis:
+                    comments.append({
+                        "deleted": False,
+                        "line_number": new_file_line_counter,
+                        "comment": analysis[line]
+                    })
+                new_file_line_counter += 1
+            else:
+                if line in analysis:
+                    comments.append({
+                        "deleted" : False,
+                        "line_number": new_file_line_counter,
+                        "comment" : analysis[line]
+                    })
+                old_file_line_counter += 1
+                new_file_line_counter += 1
         return comments
+
+
