@@ -12,6 +12,7 @@ name: Auto Code Review
 
 on:
   pull_request:
+    types:  [opened, synchronize, reopened]
     branches:
       - '*'
 
@@ -39,14 +40,19 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: python -m auto_code_review.cli --config config.yaml --owner ${{ github.repository_owner }} --repo ${{ github.event.repository.name }} --pr-number ${{ github.event.pull_request.number }}
+          GITHUB_HEAD_REF: ${{ github.head_ref }}
+          GITHUB_BASE_REF: ${{ github.base_ref }}
+          REPO_OWNER: ${{ github.repository_owner }}
+          REPO_NAME: ${{ github.event.repository.name }}
+          PULL_NUMBER: ${{ github.event.number }}
+        run: python -m auto_code_review.cli --config config.yaml
 ```
 
 ## How It Works
 
 1. **Trigger on `pull_request`:** The workflow is triggered when a Pull Request is created, updated, or reopened.
 2. **Set Up Python Environment:** The workflow sets up Python version `3.12` and installs the `auto-code-review` package from PyPI.
-3. **Run Auto Code Review:** The `auto_code_review.cli` command is executed to analyze the changes in the Pull Request using OpenAI’s API. The tool will leave inline comments on the code changes with suggestions for improvements or potential issues.
+3. **Run Auto Code Review:** The `auto_code_review.cli` command is executed to analyze the changes in the Pull Request using OpenAI’s API. The tool will leave inline comments on the code changes with  potential issues.
 
 ## Prerequisites
 
@@ -62,23 +68,20 @@ To enable automatic code review, simply create a Pull Request from any branch in
 ## Additional Notes
 
 - This workflow supports any branch (`branches: ['*']`), meaning it will run for Pull Requests involving any source or target branch.
-- The tool is configured via a `config.yaml` file, which should be present in the root directory of your repository. This file allows you to specify various settings such as the AI model, temperature, and code style preferences.
-- If you encounter issues, ensure that the `OPENAI_API_KEY` is set correctly in your repository secrets.
+- The tool is configured via a `config.yaml` file, which should be present in the root directory of your repository. This file allows you to specify various settings such as the AI model, temperature and file extensions
 
 ## Sample Config File (`config.yaml`)
 
 ```yaml
+# config.yml
+
 analysis:
-  ai_model: "gpt-4o-mini"
-  file_extensions: [".py", ".cpp"]
+  file_extensions: [".py", ".cpp",".yaml"]
 
 ai_settings:
   ai_model: gpt-4o-mini
   temperature: 0.7
   max_tokens: 1000
-  code_style: 
-    .py: PEP-8
-    .cpp : Google c++ Style
 ```
 
 In this configuration:
