@@ -14,6 +14,7 @@ class AIAnalyzer:
         prompt = f"""
             Could you describe briefly {{problems}} for the next code with given git diffs or make suggestions to realization and code-style?
             Please, also, do not add intro words, just print errors in the format: "line_number : cause effect".
+            Where line_number is the number of the line in the whole file
             If there are no {{problems}}, just say "{{no_response}}".
 
             DIFFS:
