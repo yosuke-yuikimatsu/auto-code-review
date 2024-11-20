@@ -58,7 +58,6 @@ class AIAnalyzer:
             print(f"Invalid request to API: {e}")
         except Exception as e:
             print(f"An unknown error occured: {e}")
-        sys.exit(1)
     
 
     @staticmethod
@@ -67,7 +66,7 @@ class AIAnalyzer:
             return []
         
         lines = input.strip().split("\n")
-        models = []
+        response = []
 
         for full_text in lines:
             number_str = ''
@@ -87,8 +86,8 @@ class AIAnalyzer:
             if number_str:
                 number = int(number_str)
 
-            models.append({"line" : number, "comment" : full_text})
-        return models
+            response.append({"line" : number, "comment" : full_text})
+        return response
     
 
 

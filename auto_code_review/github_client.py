@@ -16,6 +16,9 @@ class GitHubClient:
         self.__url_add_comment = f"https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}/comments"
         self.__url_add_issue = f"https://api.github.com/repos/{owner}/{repo}/issues/{pr_number}/comments"
     
+    ## Since using interacting via GitHub API is much more time-consuming git command are used directly instead
+    ## It is worth saying that they can be used only in GitHub Actions because of copying the whole repository
+
     @staticmethod
     def __run_subprocess(options):
         result = subprocess.run(options, stdout=subprocess.PIPE, text=True)
