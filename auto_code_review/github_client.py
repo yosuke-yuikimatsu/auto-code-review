@@ -45,6 +45,11 @@ class GitHubClient:
         command = ["git", "diff", "-U0", f"{remote_name}/{self.base_ref}", f"{remote_name}/{self.head_ref}", "--", file_path]
         return self.__run_subprocess(command)
     
+    def get_blob_content(self, commit_sha, file_path):
+        command = ["git", "show", f"{commit_sha}:{file_path}"]
+        return self.__run_subprocess(command)
+
+    
     def post_comment_to_line(self, text, commit_id, file_path, line):
         body = {
             "body": text,

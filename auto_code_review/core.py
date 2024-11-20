@@ -94,6 +94,8 @@ class Reviewer:
             if len(file_diffs) == 0:
                 print(f"{file} diffs are empty")
 
+            print("DIFFS:\n",file_diffs)
+            print("CODE:\n",file_content)
             responses = self.analyzer.analyze_diff(file_diffs,file_content)
 
             for response in responses:
