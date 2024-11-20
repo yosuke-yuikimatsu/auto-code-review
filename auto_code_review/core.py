@@ -102,7 +102,7 @@ class Reviewer:
                 print("file:",file)
                 print("line:",line)
                 print("comment:",comment)
-                if not comment:
+                if not comment or line == 0:
                     print("No comments were given")
                     continue
                 if line is None:
