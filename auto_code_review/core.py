@@ -99,6 +99,9 @@ class Reviewer:
             for response in responses:
                 line = response.get("line")
                 comment = response.get("comment")
+                print("file:",file)
+                print("line:",line)
+                print("comment:",comment)
                 if not comment:
                     print("No comments were given")
                     continue
