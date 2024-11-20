@@ -28,9 +28,10 @@ class AIAnalyzer:
 
         return prompt
 
-    def analyze_diff(self, diff, code):
+    def analyze_diff(self, diff, code, new_code):
         print("DIFF:",diff)
-        print("CODE:",code)
+        print("OLD CODE:",code)
+        print("NEW CODE:", new_code)
         try:
             response = self.client.chat.completions.create(
                 model=self.model,
