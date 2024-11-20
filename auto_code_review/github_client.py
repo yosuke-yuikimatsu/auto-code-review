@@ -48,12 +48,17 @@ class GitHubClient:
         command = ["git", "diff", f"{remote_name}/{self.base_ref}", f"{remote_name}/{self.head_ref}", "--", file_path]
         return self.__run_subprocess(command)
     
+    def get_new_version_of_file(self,file_path) :
+        command = ["git", "show", f"{self.head_ref}:{file_path}"]
+        result = self.__run_subprocess(command)
+        return result
+    
     def post_comment_to_line(self, text, commit_id, file_path, line):
         body = {
             "body": text,
             "commit_id": commit_id,
             "path" : file_path,
-            "line" : 28,
+            "line" : line,
             "side" : "LEFT"
         }
         response = requests.post(self.__url_add_comment, json = body, headers = self.headers)

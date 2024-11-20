@@ -93,8 +93,10 @@ class Reviewer:
 
             if len(file_diffs) == 0:
                 print(f"{file} diffs are empty")
+            
+            new_file_content = self.github.get_new_version_of_file(file)
 
-            responses = self.analyzer.analyze_diff(file_diffs,file_content)
+            responses = self.analyzer.analyze_diff(file_diffs,file_content,new_file_content)
 
             for response in responses:
                 line = response.get("line")
