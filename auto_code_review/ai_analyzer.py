@@ -24,14 +24,13 @@ class AIAnalyzer:
 
             Full code from the file:
 
-            {code}
+            {code}\n
             """.strip()
 
         return prompt
 
     def analyze_diff(self, diff, code):
-        print("DIFF:",diff)
-        print("OLD CODE:",code)
+        print("PROMPT:",self.make_prompt(diff,code))
         try:
             response = self.client.chat.completions.create(
                 model=self.model,
