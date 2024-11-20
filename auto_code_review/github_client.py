@@ -50,7 +50,7 @@ class GitHubClient:
             "body": text,
             "commit_id": commit_id,
             "path" : file_path,
-            "line" : 1
+            "position" : 11
         }
         response = requests.post(self.__url_add_comment, json = body, headers = self.headers)
         response.raise_for_status()
