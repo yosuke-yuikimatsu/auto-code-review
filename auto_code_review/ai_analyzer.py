@@ -13,7 +13,7 @@ class AIAnalyzer:
     def make_prompt(diff,code) :
         prompt = f"""
             Could you describe briefly {{problems}} for the next code with given git diffs or make suggestions to realization and code-style?
-            Please, also, do not add intro words, just print errors in the format: "line_number : cause effect".
+            Please, also, do not add intro words, just print in the format: "line_number : your comment".
             If there are no {{problems}}, just say "{{no_response}}".
 
             DIFFS:

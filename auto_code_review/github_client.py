@@ -42,7 +42,7 @@ class GitHubClient:
         return result.strip().splitlines()
     
     def get_diff_in_file(self,remote_name,file_path) -> str:
-        command = ["git", "diff", f"{remote_name}/{self.base_ref}", f"{remote_name}/{self.head_ref}", "--", file_path]
+        command = ["git", "diff", "-U0", f"{remote_name}/{self.base_ref}", f"{remote_name}/{self.head_ref}", "--", file_path]
         return self.__run_subprocess(command)
     
     def post_comment_to_line(self, text, commit_id, file_path, line):
