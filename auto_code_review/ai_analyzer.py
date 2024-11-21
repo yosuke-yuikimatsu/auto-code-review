@@ -1,5 +1,4 @@
 import openai
-import sys
 
 class AIAnalyzer:
     def __init__(self, api_key, settings):
