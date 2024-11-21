@@ -1,5 +1,13 @@
-import openai
-import sys
+def clean_file(file) :
+    new_file = ""
+    for line in file.splitlines(True) :
+        if line[:-1].strip() : 
+            new_file += line
+        else:
+            new_file += '##\n'
+    return new_file
+
+file = """import sys
 
 class AIAnalyzer:
     def __init__(self, api_key, settings):
@@ -11,41 +19,21 @@ class AIAnalyzer:
 
     @staticmethod
     def make_prompt(diff,code) :
-        prompt = f"""Could you describe briefly {{problems}} for the next code with the given git diffs or make suggestions for realization and code-style?
+        prompt = 
+            Could you describe briefly {{problems}} for the next code with given git diffs or make suggestions to realization and code-style?
+            Please, also, do not add intro words, just print errors in the format: "line_number : cause effect".
+            Where line_number is the number of the line in the whole file.
+            Empty lines are also lines. So, take them into consideration when calculating line numbers.
+            If there are no {{problems}}, just say "{{no_response}}
 
-### Instructions on Line Numbering:
-1. Count all lines in the provided code, including empty lines, lines with only whitespace, and lines with only comments (e.g., "##").
-2. Do not include the "git diffs" section in the line numbering of the code.
-3. Assign line numbers sequentially, starting from 1 for the very first line in the file.
-4. Treat empty lines, whitespace-only and comment-only lines as regular lines, ensuring they are included in the numbering.
-5. In your response, refer to the lines by their absolute number in the file, as per the above rules.
+            DIFFS:
 
-### Response Format:
-For each issue, return in the following format:
-`line_number : your comment`
+            {diff}
 
-If there are no issues, respond with `{{no_response}}`.
+            Full code from the file:
 
-### Example:
-#### Input Code:
-```python
-##
-
-print("Hello")
-
-
-def foo():
-    pass
-    
-### Example output:
-3 : consider replacing Hello with Hello, World! 
-
-git diffs :
-{diff}
-
-code:
-{code}"""
-
+            {code}\n
+            strip()
 
         return prompt
 
@@ -111,6 +99,6 @@ code:
 
             response.append({"line" : number, "comment" : full_text})
         return response
-    
+"""
 
-
+print(clean_file(file))
