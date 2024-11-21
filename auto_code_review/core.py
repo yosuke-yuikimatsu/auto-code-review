@@ -62,7 +62,6 @@ class Reviewer:
             raise ValueError("No file_extensions found.File_extensions must be written in config.yaml file")
 
         for file in changed_files:
-            print("file from diff:",file)
 
             _, file_extension = os.path.splitext(file)
 
@@ -88,14 +87,15 @@ class Reviewer:
                 continue
             
             intervals = Util.parse_diffs(file_diffs)
-            
+
             responses = self.analyzer.analyze_diff(file_diffs,file_content)
 
 
             for response in responses:
                 line = response.get("line")
                 comment = response.get("comment")
-                print("\n")
+                print("line:",line,end=" ")
+                print("comment:",comment,end= " ")
                 if not Util.check_availability_to_post_comment(line,intervals) :
                     print("Line is out of available context")
                     continue

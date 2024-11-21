@@ -50,7 +50,6 @@ class Util:
                     context = context.split("@@")[0]
                     end = int(start) + int(context) - 1
                     intervals.append((int(start),end))
-                    print(start,end,end="  ")
                 except:
                     continue
         
