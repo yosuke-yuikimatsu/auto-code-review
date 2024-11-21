@@ -71,6 +71,7 @@ class Reviewer:
             raise ValueError("No file_extensions found.File_extensions must be written in config.yaml file")
 
         for file in changed_files:
+            print("file from diff:",file)
 
             _, file_extension = os.path.splitext(file)
 
@@ -103,10 +104,10 @@ class Reviewer:
                 print("file:",file)
                 print("line:",line)
                 print("comment:",comment)
-                if not comment or line == 0:
+                if not comment:
                     print("No comments were given")
                     continue
-                if line is None:
+                if line is None or line == 0:
                     self.github.post_comment_general(comment)
                 else:
                     self.github.post_comment_to_line(comment,self.github.get_last_commit_sha(file),file,line)

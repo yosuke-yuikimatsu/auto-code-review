@@ -56,8 +56,11 @@ class GitHubClient:
             "line" : line,
             "side" : "RIGHT"
         }
-        response = requests.post(self.__url_add_comment, json = body, headers = self.headers)
-        response.raise_for_status()
+        try:
+            response = requests.post(self.__url_add_comment, json = body, headers = self.headers)
+            response.raise_for_status()
+        except requests.exceptions.RequestException as e:
+            print(f"failed to post comment on the line: {line} in {file_path} : {e}")
 
     def post_comment_general(self, text):
         body = {
