@@ -95,6 +95,7 @@ class Reviewer:
             for response in responses:
                 line = response.get("line")
                 comment = response.get("comment")
+                print("\n")
                 if not Util.check_availability_to_post_comment(line,intervals) :
                     print("Line is out of available context")
                     continue

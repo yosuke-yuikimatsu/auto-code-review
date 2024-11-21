@@ -57,6 +57,7 @@ class Util:
     @staticmethod
     def check_availability_to_post_comment(line_number : int, intervals : tp.List[tuple]) -> bool:
         for start, end in intervals:
+            print(intervals, end = " ")
             if start <= line_number <= end:
                 return True
         return False
