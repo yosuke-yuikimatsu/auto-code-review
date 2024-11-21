@@ -42,12 +42,12 @@ class Util:
     
     @staticmethod
     def parse_diffs(diff : str) -> tp.List[tuple[int,int]]:
-        print("diff:",diff)
         intervals : tp.List[tuple[int,int]] = []
         for line in diff.splitlines():
-            if line.startswith("@@") :
+            if line.startswith("@@"):
                 try:
                     start,context = line[line.find('+') + 1 : -2].split(',')
+                    context = context.split("@@")[0]
                     end = int(start) + int(context) - 1
                     intervals.append((int(start),end))
                     print(start,end,end="  ")
