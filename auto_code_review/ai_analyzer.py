@@ -48,7 +48,6 @@ code:
         return prompt
 
     def analyze_diff(self, diff , code)  :
-        print("PROMPT:",self.make_prompt(diff,code))
         try:
             response = self.client.chat.completions.create(
                 model=self.model,
