@@ -1,4 +1,6 @@
 import openai
+import typing as tp
+from .utils import Util
 
 class AIAnalyzer:
     def __init__(self, api_key, settings):
@@ -8,16 +10,15 @@ class AIAnalyzer:
         self.code_styles = settings.get("code_style", {})
         self.model = settings.get("ai_model", "gpt-4o-mini")
 
-    @staticmethod
-    def make_prompt(diff,code) :
+    def make_prompt(self,diff : str,code : str) -> str:
         prompt = f"""Could you describe briefly {{problems}} for the next code with the given git diffs or make suggestions for realization and code-style?
 
 ### Instructions on Line Numbering:
-1. Count all lines in the provided code, including empty lines, lines with only whitespace, and lines with only comments (e.g., "##").
-2. Do not include the "git diffs" section or any text before the "code:" marker in the line numbering of the code.
-3. Assign line numbers sequentially, starting from 1 for the very first line **after the "code:" marker**.
-4. Treat empty lines, whitespace-only, and comment-only lines as regular lines, ensuring they are included in the numbering.
-5. In your response, refer to the lines by their absolute number in the **code** section only.
+1. The provided code contains line numbers as comments in the format `## <number>` at the beginning of each line (including empty lines).
+2. Use the line numbers from these comments when referring to any line in the code.
+3. Do not comment on or analyze the line numbers themselves (e.g., `##1`, `##2`). These are technical markers for orientation and should not be included in your analysis.
+4. Treat all lines, including empty or whitespace-only lines, as regular lines for numbering and analysis.
+5. In your response, refer to the lines strictly by their absolute number as given in the comments.
 
 ### Response Format:
 For each issue, return in the following format:
@@ -28,27 +29,25 @@ If there are no issues, respond with `{{no_response}}`.
 ### Example:
 #### Input Code:
 ```python
-##
+  ##1
+  ##2
+print("Hello")  ##3
+  ## 4
+def foo():  ##5
+    pass  ##6
+```
+#### Output:
+3 : consider replacing Hello with Hello,World!
 
-print("Hello")
-
-
-def foo():
-    pass
-    
-### Example output:
-3 : consider replacing Hello with Hello, World! 
-
-git diffs :
+git diffs:
 {diff}
 
 code:
-{code}"""
-
+{Util.numerate_lines(code)}"""
 
         return prompt
 
-    def analyze_diff(self, diff, code):
+    def analyze_diff(self, diff , code)  :
         print("PROMPT:",self.make_prompt(diff,code))
         try:
             response = self.client.chat.completions.create(
@@ -68,7 +67,7 @@ code:
                 if chunk.choices[0].delta.content:
                     content.append(chunk.choices[0].delta.content)
             content = " ".join(content)
-            return self.parse_response(content)
+            return Util.parse_response(content)
 
         except openai.APIError:
             print("Authentification Error: Check your API key.")
@@ -80,38 +79,6 @@ code:
             print(f"Invalid request to API: {e}")
         except Exception as e:
             print(f"An unknown error occured: {e}")
-    
-
-    @staticmethod
-    def parse_response(input) :
-        print("Full response:")
-        if input is None or not input:
-            return []
-        
-        lines = input.strip().split("\n")
-        response = []
-
-        for full_text in lines:
-            print(full_text)
-            number_str = ''
-            number = 0
-            full_text = full_text.strip()
-            if len( full_text ) == 0:
-                continue
-
-            reading_number = True
-            for char in full_text.strip():
-                if reading_number:
-                    if char.isdigit():
-                        number_str += char
-                    else:
-                        break
-
-            if number_str:
-                number = int(number_str)
-
-            response.append({"line" : number, "comment" : full_text})
-        return response
     
 
 
