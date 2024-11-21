@@ -42,13 +42,15 @@ class Util:
     
     @staticmethod
     def parse_diffs(diff : str) -> tp.List[tuple[int,int]]:
+        print("diff:",diff)
         intervals : tp.List[tuple[int,int]] = []
         for line in diff.splitlines():
-            if line.startswith("@@") and line.endswith("@@") :
+            if line.startswith("@@") :
                 try:
                     start,context = line[line.find('+') + 1 : -2].split(',')
                     end = int(start) + int(context) - 1
                     intervals.append((int(start),end))
+                    print(start,end,end="  ")
                 except:
                     continue
         
@@ -57,7 +59,6 @@ class Util:
     @staticmethod
     def check_availability_to_post_comment(line_number : int, intervals : tp.List[tuple]) -> bool:
         for start, end in intervals:
-            print(intervals, end = " ")
             if start <= line_number <= end:
                 return True
         return False
