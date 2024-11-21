@@ -15,10 +15,10 @@ class AIAnalyzer:
 
 ### Instructions on Line Numbering:
 1. Count all lines in the provided code, including empty lines, lines with only whitespace, and lines with only comments (e.g., "##").
-2. Do not include the "git diffs" section in the line numbering of the code.
-3. Assign line numbers sequentially, starting from 1 for the very first line in the file.
-4. Treat empty lines, whitespace-only and comment-only lines as regular lines, ensuring they are included in the numbering.
-5. In your response, refer to the lines by their absolute number in the file, as per the above rules.
+2. Do not include the "git diffs" section or any text before the "code:" marker in the line numbering of the code.
+3. Assign line numbers sequentially, starting from 1 for the very first line **after the "code:" marker**.
+4. Treat empty lines, whitespace-only, and comment-only lines as regular lines, ensuring they are included in the numbering.
+5. In your response, refer to the lines by their absolute number in the **code** section only.
 
 ### Response Format:
 For each issue, return in the following format:
@@ -85,6 +85,7 @@ code:
 
     @staticmethod
     def parse_response(input) :
+        print("Full response:")
         if input is None or not input:
             return []
         
@@ -92,6 +93,7 @@ code:
         response = []
 
         for full_text in lines:
+            print(full_text)
             number_str = ''
             number = 0
             full_text = full_text.strip()
