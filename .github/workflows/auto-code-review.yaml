@@ -1,4 +1,4 @@
-name: Run main PR review
+name: Run main PR review - main
 
 on:
   pull_request:
