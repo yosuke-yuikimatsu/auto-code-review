@@ -11,7 +11,6 @@ class Util:
     
     @staticmethod
     def parse_response(input : str) -> tp.List[tp.Dict] : 
-        print("Full response:")
         if input is None or not input:
             return []
         
@@ -19,7 +18,6 @@ class Util:
         response = []
 
         for full_text in lines:
-            print(full_text)
             number_str = ''
             number = 0
             full_text = full_text.strip()
@@ -39,3 +37,25 @@ class Util:
 
             response.append({"line" : number, "comment" : full_text})
         return response
+    
+    @staticmethod
+    def parse_diffs(diff : str) -> tp.List[tuple[int,int]]:
+        intervals : tp.List[tuple[int,int]] = []
+        for line in diff.splitlines():
+            if line.startswith("@@"):
+                try:
+                    start,context = line[line.find('+') + 1 : -2].split(',')
+                    context = context.split("@@")[0]
+                    end = int(start) + int(context) - 1
+                    intervals.append((int(start),end))
+                except:
+                    continue
+        
+        return intervals
+    
+    @staticmethod
+    def check_availability_to_post_comment(line_number : int, intervals : tp.List[tuple]) -> bool:
+        for start, end in intervals:
+            if start <= line_number <= end:
+                return True
+        return False

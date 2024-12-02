@@ -1,9 +1,10 @@
 import openai
 import typing as tp
 from .utils import Util
+import logging
 
 class AIAnalyzer:
-    def __init__(self, api_key, settings):
+    def __init__(self, api_key : str, settings : tp.Dict):
         self.client = openai.OpenAI(api_key=api_key)
         self.temperature = settings.get("temperature", 0.7)
         self.max_tokens = settings.get("max_tokens", 1000)
@@ -47,8 +48,7 @@ code:
 
         return prompt
 
-    def analyze_diff(self, diff , code)  :
-        print("PROMPT:",self.make_prompt(diff,code))
+    def analyze_diff(self, diff : str , code : str) -> tp.List[tp.Dict] | None :
         try:
             response = self.client.chat.completions.create(
                 model=self.model,
@@ -62,23 +62,24 @@ code:
                 max_tokens=self.max_tokens,
                 stream=True
             )
-            content = []
+            content : tp.List[str]  = []
             for chunk in response:
                 if chunk.choices[0].delta.content:
                     content.append(chunk.choices[0].delta.content)
-            content = " ".join(content)
-            return Util.parse_response(content)
+            string_content : str  = " ".join(content)
+            return Util.parse_response(string_content)
 
         except openai.APIError:
-            print("Authentification Error: Check your API key.")
+            logging.warning("Authentification Error: Check your API key.") ## logging
         except openai.RateLimitError:
-            print("Rate limit exceeded: Try later.")
+            logging.warning("Rate limit exceeded: Try later.") ## logging
         except openai.APIConnectionError:
-            print("Error while connecting to API: Check your internet connection.")
+            logging.warning("Error while connecting to API: Check your internet connection.") ## logging
         except openai.BadRequestError as e:
-            print(f"Invalid request to API: {e}")
+            logging.warning(f"Invalid request to API: {e}") ## logging
         except Exception as e:
-            print(f"An unknown error occured: {e}")
+            logging.warning(f"An unknown error occured: {e}") ## logging
+        return None
     
 
 
