@@ -98,6 +98,7 @@ class Reviewer:
                 print("comment:",comment,end= " ")
                 if not Util.check_availability_to_post_comment(line,intervals) :
                     print("Line is out of available context")
+                    self.github.post_comment_general(comment)
                     continue
                 if not comment:
                     print("No comments were given")
