@@ -9,6 +9,7 @@ class AIAnalyzer:
         self.max_tokens = settings.get("max_tokens", 1000)
         self.code_styles = settings.get("code_style", {})
         self.model = settings.get("ai_model", "o1-preview")
+        print(self.model)
 
     def make_prompt(self,diff : str,code : str) -> str:
         prompt = f"""Could you describe briefly {{problems}} for the next code with the given git diffs or make suggestions for realization and code-style?
