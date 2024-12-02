@@ -1,10 +1,13 @@
 import requests
 import subprocess
+import typing as tp
 
 class GitHubClient:
+    '''Github Client is a class which executes all interactions 
+    with GitHub via either Git Commands or REST API'''
     def __init__(self, token,repo,owner,pr_number,base_ref,head_ref):
         self.token = token # Intialize GitHub API
-        self.headers = {
+        self.headers = { # Needed for getting access to posting comments
             "Authorization": f"token {self.token}",
             "Accept": "application/vnd.github.v3+json",
         }
@@ -20,7 +23,11 @@ class GitHubClient:
     ## It is worth saying that they can be used only in GitHub Actions because of copying the whole repository
 
     @staticmethod
-    def __run_subprocess(options):
+    def __run_subprocess(options : tp.List[str]):
+        '''Key function of interaction with GitHub via Git Commands
+        It is a base for running various commands on GitHub VM
+        In options the command itself is stored as a list of strings'''
+
         result = subprocess.run(options, stdout=subprocess.PIPE, text=True)
         if result.returncode == 0:
             return result.stdout
@@ -49,6 +56,10 @@ class GitHubClient:
         return self.__run_subprocess(command)
 
     def post_comment_to_line(self, text, commit_id, file_path, line):
+        '''For purposes of economy LLM only analyzes the new version of code
+        with diffs. So, inline comments are posted to the right side(new ver of file) only.
+        Might be fixed in the near future'''
+
         body = {
             "body": text,
             "commit_id": commit_id,

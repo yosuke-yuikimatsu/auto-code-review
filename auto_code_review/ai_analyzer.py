@@ -3,12 +3,12 @@ import typing as tp
 from .utils import Util
 
 class AIAnalyzer:
-    def __init__(self, api_key, settings):
+    def __init__(self, api_key : str, settings : tp.Dict):
         self.client = openai.OpenAI(api_key=api_key)
         self.temperature = settings.get("temperature", 0.7)
         self.max_tokens = settings.get("max_tokens", 1000)
         self.code_styles = settings.get("code_style", {})
-        self.model = settings.get("ai_model", "gpt-4o-mini")
+        self.model = settings.get("ai_model", "o1-preview")
 
     def make_prompt(self,diff : str,code : str) -> str:
         prompt = f"""Could you describe briefly {{problems}} for the next code with the given git diffs or make suggestions for realization and code-style?
@@ -47,7 +47,7 @@ code:
 
         return prompt
 
-    def analyze_diff(self, diff , code)  :
+    def analyze_diff(self, diff : str , code : str) -> tp.List[tp.Dict] | None :
         try:
             response = self.client.chat.completions.create(
                 model=self.model,
@@ -61,12 +61,12 @@ code:
                 max_tokens=self.max_tokens,
                 stream=True
             )
-            content = []
+            content : tp.List[str]  = []
             for chunk in response:
                 if chunk.choices[0].delta.content:
                     content.append(chunk.choices[0].delta.content)
-            content = " ".join(content)
-            return Util.parse_response(content)
+            string_content : str  = " ".join(content)
+            return Util.parse_response(string_content)
 
         except openai.APIError:
             print("Authentification Error: Check your API key.")
@@ -78,6 +78,7 @@ code:
             print(f"Invalid request to API: {e}")
         except Exception as e:
             print(f"An unknown error occured: {e}")
+        return None
     
 
 
