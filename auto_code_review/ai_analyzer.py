@@ -48,7 +48,7 @@ code:
 
         return prompt
 
-    def analyze_diff(self, diff : str , code : str) -> tp.List[tp.Dict] | None :
+    def analyze_diff(self, diff : str , code : str) -> tp.List[tp.Dict] :
         try:
             response = self.client.chat.completions.create(
                 model=self.model,
@@ -79,7 +79,7 @@ code:
             logging.warning(f"Invalid request to API: {e}") ## logging
         except Exception as e:
             logging.warning(f"An unknown error occured: {e}") ## logging
-        return None
+        return []
     
 
 
