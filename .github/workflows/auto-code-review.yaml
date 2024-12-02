@@ -1,5 +1,5 @@
 
-name: Run main PR review - test
+name: Run main PR review - test branch
 
 on:
   pull_request:
