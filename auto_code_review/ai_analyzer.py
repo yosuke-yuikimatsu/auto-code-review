@@ -8,7 +8,7 @@ class AIAnalyzer:
         self.temperature = settings.get("temperature", 0.7)
         self.max_tokens = settings.get("max_tokens", 1000)
         self.code_styles = settings.get("code_style", {})
-        self.model = settings.get("ai_model", "o1-preview")
+        self.model = settings.get("ai_model", "gpt-4o-mini")
         print(self.model)
 
     def make_prompt(self,diff : str,code : str) -> str:
