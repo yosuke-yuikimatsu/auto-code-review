@@ -12,29 +12,32 @@ name: Auto Code Review
 
 on:
   pull_request:
-    types:  [opened, synchronize, reopened]
+    types: [opened, synchronize, reopened]
     branches:
       - '*'
 
 jobs:
-  review:
+  pr_review:
     runs-on: ubuntu-latest
-
     permissions:
       contents: write
       pull-requests: write
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.12"
 
-      - name: Install auto-code-review
-        run: pip install auto-code-review
+      - name: Install auto-code-review from PyPi
+        run: |
+          python -m pip install --upgrade pip
+          pip install auto-code-review
 
       - name: Run auto code review
         env:
