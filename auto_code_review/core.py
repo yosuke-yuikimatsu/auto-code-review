@@ -59,6 +59,12 @@ class Reviewer:
             raise RuntimeError(f"Failed to download configuration file '{config_file}': {e}")  
 
     def review_pull_request(self) :
+        ''' This functions handles the whole process of auto-code-review step by step
+        First, it collect files with diffs. Second, it filters them by extensions.
+        Third, it downloads the file itself and sends a prompt which contains both file and its diffs
+        to ChatGpt. Fourth, it filters comments and checks whether they can be posted in line or not '''
+
+
         remote_name = self.github.get_remote_name()
 
         changed_files = self.github.get_diff_files(remote_name)

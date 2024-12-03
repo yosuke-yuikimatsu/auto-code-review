@@ -4,6 +4,9 @@ class Util:
     
     @staticmethod
     def numerate_lines(code : str) -> str:
+        '''Since LLM have troubles with numeration due to tokenization
+        manual numeration is necessary for correct inline comment posting'''
+
         numerated_code = ""
         for i,line in enumerate(code.splitlines()) :
             numerated_code += line + f"  ##{i + 1}" + "\n"
@@ -11,6 +14,9 @@ class Util:
     
     @staticmethod
     def parse_response(input : str) -> tp.List[tp.Dict] : 
+        '''Comments are parsed into the following format
+        line : Comment where Comment also contains the line number'''
+
         if input is None or not input:
             return []
         
@@ -40,6 +46,11 @@ class Util:
     
     @staticmethod
     def parse_diffs(diff : str) -> tp.List[tuple[int,int]]:
+        '''Since GitHub only allows to post inline comments within a context interval
+        it is reasonable to collect all these intervals to ensure availability of posting
+        given comment'''
+
+    
         intervals : tp.List[tuple[int,int]] = []
         for line in diff.splitlines():
             if line.startswith("@@"):
