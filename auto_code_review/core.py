@@ -80,17 +80,17 @@ class Reviewer:
                 with open(file, 'r') as file_opened:
                     file_content = file_opened.read()
             except FileNotFoundError:
-                logging.info(f"{file} was deleted") ## logging
+                logging.info(f"{file} was deleted") 
                 continue
 
             if len(file_content) == 0:
-                logging.info(f"{file} is empty") ## logging
+                logging.info(f"{file} is empty")
                 continue
 
             file_diffs = self.github.get_diff_in_file(remote_name,file)
 
             if len(file_diffs) == 0:
-                logging.info(f"{file} diffs are empty") ## logging           
+                logging.info(f"{file} diffs are empty")          
                 continue
             
             intervals = Util.parse_diffs(file_diffs)
@@ -102,11 +102,11 @@ class Reviewer:
                 line = response.get("line")
                 comment = response.get("comment")
                 if not Util.check_availability_to_post_comment(line,intervals) :
-                    logging.info(f"Line : {line} is out of available context") ## logging
+                    logging.info(f"Line : {line} is out of available context")
                     self.github.post_comment_general(comment)
                     continue
                 if not comment:
-                    logging.info("No comments were given") ## logging
+                    logging.info("No comments were given")
                     continue
                 if line is None or line == 0:
                     self.github.post_comment_general(comment)
