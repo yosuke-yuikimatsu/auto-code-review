@@ -19,7 +19,7 @@ class AIAnalyzer:
     def __init__(self, api_key : str, settings : tp.Dict):
         self.client = openai.OpenAI(api_key=api_key)
         self.temperature = settings.get("temperature", 0.7)
-        self.max_tokens = settings.get("max_tokens", 1000)
+        self.max_tokens = settings.get("max_tokens", 5000)
         self.code_styles = settings.get("code_style", {})
         self.model = settings.get("ai_model", "gpt-4o-mini")
 
