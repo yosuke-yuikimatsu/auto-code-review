@@ -16,7 +16,8 @@ class AIAnalyzer:
 
         templates_path = os.path.join(os.path.dirname(__file__), self.prompt_folder)
 
-        print(templates_path)
+        if not os.path.isfile(os.path.join(templates_path, "prompt_template.jinja2")):
+            logging.warning("Шаблон prompt_template.jinja2 не найден в папке.")
 
         # Настроим Jinja2 для загрузки шаблонов из папки
         self.env = Environment(loader=FileSystemLoader(templates_path))
