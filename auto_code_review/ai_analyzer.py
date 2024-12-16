@@ -16,6 +16,8 @@ class AIAnalyzer:
 
         templates_path = os.path.join(os.path.dirname(__file__), self.prompt_folder)
 
+        print(templates_path)
+
         # Настроим Jinja2 для загрузки шаблонов из папки
         self.env = Environment(loader=FileSystemLoader(templates_path))
 
