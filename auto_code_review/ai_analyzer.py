@@ -2,6 +2,18 @@ import openai
 import typing as tp
 from .utils import Util
 import logging
+from pydantic import BaseModel
+
+class InlineComment(BaseModel):
+    line: int
+    comment: str
+
+class GeneralComment(BaseModel):
+    comment: str
+
+class CodeAnalysisResponse(BaseModel):
+    inline_comments: tp.List[InlineComment]
+    general_comments: tp.List[GeneralComment]
 
 class AIAnalyzer:
     def __init__(self, api_key : str, settings : tp.Dict):
@@ -50,7 +62,7 @@ code:
 
     def analyze_diff(self, diff : str , code : str) -> tp.List[tp.Dict] :
         try:
-            response = self.client.chat.completions.create(
+            response = self.client.beta.chat.completions.parse(
                 model=self.model,
                 messages=[
                     {
@@ -60,14 +72,11 @@ code:
                 ],
                 temperature=self.temperature,
                 max_tokens=self.max_tokens,
-                stream=True
+                response_format=CodeAnalysisResponse
             )
-            content : tp.List[str]  = []
-            for chunk in response:
-                if chunk.choices[0].delta.content:
-                    content.append(chunk.choices[0].delta.content)
-            string_content : str  = " ".join(content)
-            return Util.parse_response(string_content)
+            content : CodeAnalysisResponse | None  = response.choices[0].message.parsed
+            print("Ответ от LLM:",content)
+            return []
 
         except openai.APIError:
             logging.warning("Authentification Error: Check your API key.") ## logging
