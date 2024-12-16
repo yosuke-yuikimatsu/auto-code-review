@@ -3,4 +3,3 @@ requests
 PyYAML
 pydantic
 jinja2
-pkg_resources
