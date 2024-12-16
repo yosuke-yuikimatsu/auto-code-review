@@ -100,8 +100,10 @@ class Reviewer:
                 continue
             
             intervals = Util.parse_diffs(file_diffs)
-            
+
             code_style = extensions.get(file_extension,"Default")
+            print("file_extension:",file_extension)
+            print("code_style", code_style)
 
             responses = self.analyzer.analyze_diff(file_diffs,file_content,code_style)
 

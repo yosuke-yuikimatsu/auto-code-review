@@ -22,6 +22,7 @@ class AIAnalyzer:
         template = self.env.get_template("prompt_template.jinja2")
         numerated_code = Util.numerate_lines(code)
         prompt = template.render(diff=diff, code=numerated_code, code_style=code_style)
+        print("prompt:",prompt)
         return prompt
 
     def analyze_diff(self, diff : str , code : str, code_style : str) -> tp.List[tp.Dict] :
