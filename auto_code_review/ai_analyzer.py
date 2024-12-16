@@ -8,12 +8,8 @@ class InlineComment(BaseModel):
     line: int
     comment: str
 
-class GeneralComment(BaseModel):
-    comment: str
-
 class CodeAnalysisResponse(BaseModel):
     inline_comments: tp.List[InlineComment]
-    general_comments: tp.List[GeneralComment]
 
 class AIAnalyzer:
     def __init__(self, api_key : str, settings : tp.Dict):
