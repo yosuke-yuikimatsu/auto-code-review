@@ -100,7 +100,7 @@ class Reviewer:
                 continue
             
             intervals = Util.parse_diffs(file_diffs)
-
+            print("Файл:",file)
             responses = self.analyzer.analyze_diff(file_diffs,file_content)
 
 
