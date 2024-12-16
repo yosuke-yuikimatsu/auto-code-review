@@ -69,7 +69,7 @@ class Reviewer:
 
         changed_files = self.github.get_diff_files(remote_name)
 
-        extensions = self.config.get("analysis",{}).get("file_extensions",[])
+        extensions = self.config.get("analysis",{}).get("file_extensions",{})
         
         if not extensions:
             raise ValueError("No file_extensions found.File_extensions must be written in config.yaml file")
@@ -78,7 +78,7 @@ class Reviewer:
 
             _, file_extension = os.path.splitext(file)
 
-            if file_extension not in extensions:
+            if file_extension not in extensions.keys():
                 logging.info(f"Unsupported Extension: {file_extension}")
                 continue
             

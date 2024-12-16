@@ -1,7 +1,9 @@
 # config.yml
 
 analysis:
-  file_extensions: [".py", ".cpp",".yaml"]
+  file_extensions: 
+    .py: "PEP8"
+    .cpp: "Google Code Style"
 
 ai_settings:
   ai_model: gpt-4o-mini
