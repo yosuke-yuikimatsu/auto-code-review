@@ -43,6 +43,7 @@ class AIAnalyzer:
                 if chunk.choices[0].delta.content:
                     content.append(chunk.choices[0].delta.content)
             string_content : str  = " ".join(content)
+            print("Ответ от LLM:",string_content)
             return Util.parse_response(string_content)
 
         except openai.APIError:
