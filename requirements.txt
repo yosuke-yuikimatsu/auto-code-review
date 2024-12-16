@@ -3,3 +3,4 @@ requests
 PyYAML
 pydantic
 jinja2
+setuptools
