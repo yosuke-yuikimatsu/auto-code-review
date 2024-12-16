@@ -3,7 +3,7 @@ import typing as tp
 from .utils import Util
 import logging
 from jinja2 import Environment,FileSystemLoader
-import pkg_resources
+import os
 
 class AIAnalyzer:
     def __init__(self, api_key : str, settings : tp.Dict):
@@ -14,8 +14,10 @@ class AIAnalyzer:
         self.model = settings.get("ai_model", "gpt-4o-mini")
         self.prompt_folder = "prompts"
 
-        self.env = Environment(loader=FileSystemLoader(pkg_resources.resource_filename(
-            __name__, self.prompt_folder)))
+        templates_path = os.path.join(os.path.dirname(__file__), self.prompt_folder)
+
+        # Настроим Jinja2 для загрузки шаблонов из папки
+        self.env = Environment(loader=FileSystemLoader(templates_path))
 
     def make_prompt(self,diff : str,code : str, code_style : str) -> str:
         
