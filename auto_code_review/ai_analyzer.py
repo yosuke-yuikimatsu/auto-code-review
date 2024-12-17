@@ -45,6 +45,7 @@ class AIAnalyzer:
                 response_format=Response,
             ) as stream:
                 for event in stream:
+                    print(stream)
                     if event.type == "content.delta":
                         if event.parsed is not None:
                             print(event.parsed)
