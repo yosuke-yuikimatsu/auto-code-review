@@ -47,8 +47,8 @@ class AIAnalyzer:
                 max_tokens=self.max_tokens,
                 response_format=Response
             )
-            reply = response.choices[0].message
-            print(reply.parsed)
+            reply = response.choices[0].message.parsed
+            print(reply.final_answer)
 
         except openai.APIError:
             logging.warning("Authentification Error: Check your API key.") ## logging
