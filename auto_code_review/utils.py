@@ -1,5 +1,5 @@
 import typing as tp
-from ai_analyzer import Response
+from .ai_analyzer import Response
 
 class Util:
     
