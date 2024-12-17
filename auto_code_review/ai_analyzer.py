@@ -6,12 +6,9 @@ from jinja2 import Environment,FileSystemLoader
 import os
 from pydantic import BaseModel
 
-class InlineComment(BaseModel) :
-    line : int
-    comment : str
 
 class Response(BaseModel) :
-    inline_comments : tp.List[InlineComment]
+    inline_comments : tp.List[tp.Tuple[int,str]]
 
 class AIAnalyzer:
     def __init__(self, api_key : str, settings : tp.Dict):
