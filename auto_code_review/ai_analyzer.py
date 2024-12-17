@@ -33,7 +33,7 @@ class AIAnalyzer:
         prompt = template.render(diff=diff, code=numerated_code, code_style=code_style)
         return prompt
 
-    def analyze_diff(self, diff : str , code : str, code_style : str) -> tp.List[tp.Dict] :
+    def analyze_diff(self, diff : str , code : str, code_style : str) :
         try:
             response = self.client.beta.chat.completions.parse(
                 model=self.model,
@@ -47,8 +47,8 @@ class AIAnalyzer:
                 max_tokens=self.max_tokens,
                 response_format=Response
             )
-            reply = response.choices[0].message.parsed
-            print(reply.final_answer)
+            content : Response | None  = response.choices[0].message.parsed
+            print("Ответ от LLM:",content)
             return []
 
         except openai.APIError:
