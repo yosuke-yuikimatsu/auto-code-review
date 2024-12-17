@@ -18,7 +18,6 @@ class TestUtilMethods(unittest.TestCase):
   ##5
 """
         result = Util.numerate_lines(code)
-        print("result:",result)
         self.assertEqual(result, expected_output)
 
     def test_parse_response(self):
