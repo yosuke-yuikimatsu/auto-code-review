@@ -1,4 +1,5 @@
 import typing as tp
+from ai_analyzer import Response
 
 class Util:
     
@@ -70,3 +71,10 @@ class Util:
             if start <= line_number <= end:
                 return True
         return False
+    
+    @staticmethod
+    def parse_response_test(content : Response) -> tp.List[tp.Dict] :
+        response = []
+        for inline_comment in content.inline_comments:
+            response.append({"line": inline_comment.line, "comment" : inline_comment.comment})
+        return response

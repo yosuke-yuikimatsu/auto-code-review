@@ -49,7 +49,7 @@ class AIAnalyzer:
             )
             content : Response | None  = response.choices[0].message.parsed
             print("Ответ от LLM:",content)
-            return []
+            return Util.parse_respone_test(content)
 
         except openai.APIError:
             logging.warning("Authentification Error: Check your API key.") ## logging
