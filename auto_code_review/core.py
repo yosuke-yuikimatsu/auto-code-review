@@ -109,7 +109,7 @@ class Reviewer:
                 line = response.get("line")
                 comment = response.get("comment")
                 if not Util.check_availability_to_post_comment(line,intervals) :
-                    logging.info(f"Line : {line} is out of available context")
+                    logging.info(f"Line : {line} is out of available context. Posting general comment")
                     self.github.post_comment_general(comment)
                     continue
                 if not comment:
