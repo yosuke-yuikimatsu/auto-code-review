@@ -15,7 +15,6 @@ class Response(BaseModel) :
 
 class AIAnalyzer:
     def __init__(self, api_key : str, settings : tp.Dict):
-        print(api_key[:5])
         self.client = openai.OpenAI(api_key=api_key)
         self.temperature = settings.get("temperature", 0.7)
         self.max_tokens = settings.get("max_tokens", 1000)
@@ -50,7 +49,7 @@ class AIAnalyzer:
             )
             content : Response | None  = response.choices[0].message.parsed
             print("Ответ от LLM:",content)
-            return Util.parse_respone_test(content)
+            return []
 
         except openai.APIError:
             logging.warning("Authentification Error: Check your API key.") ## logging
