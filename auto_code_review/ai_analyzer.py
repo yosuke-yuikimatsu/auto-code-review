@@ -4,6 +4,14 @@ from .utils import Util
 import logging
 from jinja2 import Environment,FileSystemLoader
 import os
+from pydantic import BaseModel
+
+class InlineComment(BaseModel) :
+    line : int
+    comment : str
+
+class Response(BaseModel) :
+    inline_comments : tp.List[InlineComment]
 
 class AIAnalyzer:
     def __init__(self, api_key : str, settings : tp.Dict):
@@ -25,26 +33,24 @@ class AIAnalyzer:
         prompt = template.render(diff=diff, code=numerated_code, code_style=code_style)
         return prompt
 
-    def analyze_diff(self, diff : str , code : str, code_style : str) -> tp.List[tp.Dict] :
+    def analyze_diff(self, diff : str , code : str, code_style : str) :
         try:
-            response = self.client.chat.completions.create(
-                model=self.model,
+            with self.client.beta.chat.completions.stream(
+                model = self.model,
                 messages=[
-                    {
-                        "role": "system",
-                        "content": self.make_prompt(diff,code,code_style)
-                    },
+                    {"role": "system", "content": self.make_prompt(diff,code,code_style)}
                 ],
                 temperature=self.temperature,
                 max_tokens=self.max_tokens,
-                stream=True
-            )
-            content : tp.List[str]  = []
-            for chunk in response:
-                if chunk.choices[0].delta.content:
-                    content.append(chunk.choices[0].delta.content)
-            string_content : str  = " ".join(content)
-            return Util.parse_response(string_content)
+                response_format=Response,
+            ) as stream:
+                for event in stream:
+                    if event.type == "content.delta":
+                        if event.parsed is not None:
+                            print(event.parsed)
+                            return []
+                        else:
+                            return []
 
         except openai.APIError:
             logging.warning("Authentification Error: Check your API key.") ## logging
