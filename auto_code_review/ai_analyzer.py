@@ -6,7 +6,7 @@ from jinja2 import Environment,FileSystemLoader
 import os
 from pydantic import BaseModel
 
-class InlineComment :
+class InlineComment(BaseModel) :
     line : int
     comment : str
 
