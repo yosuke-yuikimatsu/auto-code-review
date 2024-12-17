@@ -33,28 +33,22 @@ class AIAnalyzer:
         prompt = template.render(diff=diff, code=numerated_code, code_style=code_style)
         return prompt
 
-    def analyze_diff(self, diff : str , code : str, code_style : str) :
+    def analyze_diff(self, diff : str , code : str, code_style : str) -> tp.List[tp.Dict] :
         try:
-            with self.client.beta.chat.completions.stream(
-                model = self.model,
+            response = self.client.beta.chat.completions.parse(
+                model=self.model,
                 messages=[
-                    {"role": "system", "content": self.make_prompt(diff,code,code_style)}
+                    {
+                        "role": "system",
+                        "content": self.make_prompt(diff,code,code_style)
+                    },
                 ],
                 temperature=self.temperature,
                 max_tokens=self.max_tokens,
-                response_format=Response,
-            ) as stream:
-              for event in stream:
-                if event.type == "content.delta":
-                    if event.parsed is not None:
-              # Print the parsed data as JSON
-                        print("content.delta parsed:", event.parsed)
-                elif event.type == "content.done":
-                    print("content.done")
-                elif event.type == "error":
-                    print("Error in stream:", event.error)
-            print(stream.get_final_completion())
-            return []
+                response_format=Response
+            )
+            reply = response.choices[0].message
+            print(reply)
 
         except openai.APIError:
             logging.warning("Authentification Error: Check your API key.") ## logging
