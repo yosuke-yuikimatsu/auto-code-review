@@ -48,7 +48,7 @@ class AIAnalyzer:
                 response_format=Response
             )
             reply = response.choices[0].message
-            print(reply)
+            print(reply.parsed)
 
         except openai.APIError:
             logging.warning("Authentification Error: Check your API key.") ## logging
