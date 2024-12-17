@@ -14,12 +14,8 @@ class AIAnalyzer:
         self.model = settings.get("ai_model", "gpt-4o-mini")
         self.prompt_folder = "prompts"
 
+        ## Setup for prompt templates (Might be updated to several prompts)
         templates_path = os.path.join(os.path.dirname(__file__), self.prompt_folder)
-
-        if not os.path.isfile(os.path.join(templates_path, "prompt_template.jinja2")):
-            logging.warning("Шаблон prompt_template.jinja2 не найден в папке.")
-
-        # Настроим Jinja2 для загрузки шаблонов из папки
         self.env = Environment(loader=FileSystemLoader(templates_path))
 
     def make_prompt(self,diff : str,code : str, code_style : str) -> str:
@@ -27,7 +23,6 @@ class AIAnalyzer:
         template = self.env.get_template("prompt_template.jinja2")
         numerated_code = Util.numerate_lines(code)
         prompt = template.render(diff=diff, code=numerated_code, code_style=code_style)
-        print("prompt:",prompt)
         return prompt
 
     def analyze_diff(self, diff : str , code : str, code_style : str) -> tp.List[tp.Dict] :
@@ -49,7 +44,6 @@ class AIAnalyzer:
                 if chunk.choices[0].delta.content:
                     content.append(chunk.choices[0].delta.content)
             string_content : str  = " ".join(content)
-            print("Ответ от LLM:",string_content)
             return Util.parse_response(string_content)
 
         except openai.APIError:

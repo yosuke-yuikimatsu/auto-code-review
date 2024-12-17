@@ -72,7 +72,7 @@ class Reviewer:
         extensions = self.config.get("analysis",{}).get("file_extensions",{})
         
         if not extensions:
-            raise ValueError("No file_extensions found.File_extensions must be written in config.yaml file")
+            raise ValueError("No file_extensions found. File_extensions must be written in config.yaml file")
 
         for file in changed_files:
 
@@ -102,9 +102,6 @@ class Reviewer:
             intervals = Util.parse_diffs(file_diffs)
 
             code_style = extensions.get(file_extension,"Default")
-            print("file_extension:",file_extension)
-            print("code_style", code_style)
-
             responses = self.analyzer.analyze_diff(file_diffs,file_content,code_style)
 
 
