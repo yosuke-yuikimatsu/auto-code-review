@@ -110,13 +110,13 @@ class Reviewer:
                 comment = response.get("comment")
                 if not Util.check_availability_to_post_comment(line,intervals) :
                     logging.info(f"Line : {line} is out of available context. Posting general comment")
-                    self.github.post_comment_general(comment)
+                    self.github.post_comment_general(file + comment)
                     continue
                 if not comment:
                     logging.info("No comments were given")
                     continue
                 if line is None or line == 0:
-                    self.github.post_comment_general(comment)
+                    self.github.post_comment_general(file + comment)
                 else:
                     self.github.post_comment_to_line(comment,self.github.get_last_commit_sha(file),file,line)
 
