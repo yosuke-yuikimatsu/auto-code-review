@@ -26,6 +26,7 @@ class AIAnalyzer:
         return prompt
 
     def analyze_diff(self, diff : str , code : str, code_style : str) -> tp.List[tp.Dict] :
+        print("промпт по шаблону", self.make_prompt(diff,code,code_style))
         try:
             response = self.client.chat.completions.create(
                 model=self.model,
