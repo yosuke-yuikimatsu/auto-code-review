@@ -77,14 +77,15 @@ To enable automatic code review, simply create a Pull Request from any branch in
 
 ```yaml
 # config.yml
-
 analysis:
-  file_extensions: [".py", ".cpp",".yaml"]
+  file_extensions: 
+    .py: "PEP8"
+    .cpp: "Google Code Style"
 
 ai_settings:
   ai_model: gpt-4o-mini
   temperature: 0.7
-  max_tokens: 1000
+  max_tokens: 1000 
 ```
 
 In this configuration:
